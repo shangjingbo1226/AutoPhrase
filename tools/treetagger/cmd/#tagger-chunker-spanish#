@@ -1,0 +1,28 @@
+>0;136;0c#!/bin/sh
+
+# Set these paths appropriately
+
+BIN=./bin
+CMD=./cmd
+LIB=./lib
+
+OPTIONS="-token -lemma -sgml"
+
+TOKENIZER=${CMD}/utf8-tokenize.perl
+TAGGER=${BIN}/tree-tagger
+ABBR_LIST=${LIB}/english-abbreviations
+PARFILE=${LIB}/english-utf8.par
+
+PARFILE2=${LIB}/english-chunker-utf8.par
+FILTER=${CMD}/filter-chunker-output.perl
+
+$TOKENIZER -e -a $ABBR_LIST $* |
+# remove empty lines
+grep -v '^$' |
+# tagging
+$TAGGER $OPTIONS $PARFILE | 
+perl -nae 'if ($#F==0){print}else{print "$F[0]-$F[1]\n"}' |
+$TAGGER $PARFILE2 -token -sgml -eps 0.00000001 -hyphen-heuristics -quiet |
+$FILTER |
+$TAGGER $OPTIONS $PARFILE |
+perl -pe 's/\tIN\/that/\tIN/;s/\tV[BDHV]/\tVB/'

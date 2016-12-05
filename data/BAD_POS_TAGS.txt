@@ -1,0 +1,185 @@
+===unigram===
+CC	coordinating conjunction	and, but, or, &
+EX	existential there	there is
+IN	preposition/subord. conj.	in,of,like,after,whether
+IN/that	complementizer	that
+LS	list marker	(1),
+MD	modal	could, will
+PP	personal pronoun	I, he, it
+PP$	possessive pronoun	my, his
+TO	to	to go, to him
+UH	interjection	uhhuhhuhh
+SENT	end punctuation	?, !, .
+VB	verb be, base form	be
+VBD	verb be, past	was|were
+VBG	verb be, gerund/participle	being
+VBN	verb be, past participle	been
+VBZ	verb be, pres, 3rd p. sing	is
+VBP	verb be, pres non-3rd p.	am|are
+VD	verb do, base form	do
+VDD	verb do, past	did
+VDG	verb do gerund/participle	doing
+VDN	verb do, past participle	done
+VDZ	verb do, pres, 3rd per.sing	does
+VDP	verb do, pres, non-3rd per.	do
+VH	verb have, base form	have
+VHD	verb have, past	had
+VHG	verb have, gerund/participle	having
+VHN	verb have, past participle	had
+VHZ	verb have, pres 3rd per.sing	has
+VHP	verb have, pres non-3rd per.	have
+:	general joiner	;, -, --
+WDT	wh-determiner	which
+WP	wh-pronoun	who, what
+WP$	possessive wh-pronoun	whose
+WRB	wh-abverb	where, when
+,
+''
+UNKNOWN	in Chinese POS tagger
+v	verb
+vd	auxiliary verb
+vn	noun verb
+vshi	verb "is"
+vyou	verb ""
+vf	tendency verb
+vx	form verb
+vi	non transitive verb (internal verb)
+vl	verb phrase
+vg	verb morpheme
+m	numeral
+mq	quantity words
+u	auxiliary
+uj	auxiliary
+w	punctuation mark
+f	functional
+CM	comma (,)
+COLON	colon (:)
+FS	Full stop punctuation marks
+INT	Interrogative pronouns (quiénes, cuántas, cuánto)
+ITJN	Interjection (oh, ja)
+LP	left parenthesis ("(", "[")
+NEG	Negation
+NMEA	measure noun (metros, litros)
+PERCT	percent sign (%)
+PPC	Clitic personal pronoun (le, les)
+PPO	Possessive pronouns (mi, su, sus)
+PPX	Clitics and personal pronouns (nos, me, nosotras, te, sí)
+QU	Quantifiers (sendas, cada)
+RP	right parenthesis (")", "]")
+SEMICOLON	semicolon (;)
+UMMX	measure unit (MHz, km, mA)
+VCLIger clitic gerund verb
+VCLIinf clitic infinitive verb
+VCLIfin clitic finite verb
+VEadj	Verb estar. Past participle
+VEfin	Verb estar. Finite
+VEger	Verb estar. Gerund
+VEinf	Verb estar. Infinitive
+VHadj	Verb haber. Past participle
+VHfin	Verb haber. Finite
+VHger	Verb haber. Gerund
+VHinf	Verb haber. Infinitive
+VLadj	Lexical verb. Past participle
+VLfin	Lexical verb. Finite
+VLger	Lexical verb. Gerund
+VLinf	Lexical verb. Infinitive
+VMadj	Modal verb. Past participle
+VMfin	Modal verb. Finite
+VMger	Modal verb. Gerund
+VMinf	Modal verb. Infinitive
+VSadj	Verb ser. Past participle
+VSfin	Verb ser. Finite
+VSger	Verb ser. Gerund
+VSinf	Verb ser. Infinitive
+===expansion===
+DT	determiner	the
+$	currency symbol	$, ¡ê
+IN/that	complementizer	that
+LS	list marker	(1),
+EX	existential there	there is
+MD	modal	could, will
+PP	personal pronoun	I, he, it
+PP$	possessive pronoun	my, his
+UH	interjection	uhhuhhuhh
+SENT	end punctuation	?, !, .
+VB	verb be, base form	be
+VBD	verb be, past	was|were
+VBG	verb be, gerund/participle	being
+VBN	verb be, past participle	been
+VBZ	verb be, pres, 3rd p. sing	is
+VBP	verb be, pres non-3rd p.	am|are
+VD	verb do, base form	do
+VDD	verb do, past	did
+VDG	verb do gerund/participle	doing
+VDN	verb do, past participle	done
+VDZ	verb do, pres, 3rd per.sing	does
+VDP	verb do, pres, non-3rd per.	do
+VH	verb have, base form	have
+VHD	verb have, past	had
+VHG	verb have, gerund/participle	having
+VHN	verb have, past participle	had
+VHZ	verb have, pres 3rd per.sing	has
+VHP	verb have, pres non-3rd per.	have
+:	general joiner	;, -, --
+WDT	wh-determiner	which
+WP	wh-pronoun	who, what
+WP$	possessive wh-pronoun	whose
+WRB	wh-abverb	where, when
+,
+''
+UNKNOWN	in Chinese POS tagger
+v	verb
+vd	auxiliary verb
+vn	noun verb
+vshi	verb "is"
+vyou	verb ""
+vf	tendency verb
+vx	form verb
+vi	non transitive verb (internal verb)
+vl	verb phrase
+vg	verb morpheme
+m	numeral
+mq	quantity words
+u	auxiliary
+uj	auxiliary
+w	punctuation mark
+f	functional
+CM	comma (,)
+COLON	colon (:)
+FS	Full stop punctuation marks
+INT	Interrogative pronouns (quiénes, cuántas, cuánto)
+ITJN	Interjection (oh, ja)
+LP	left parenthesis ("(", "[")
+NEG	Negation
+NMEA	measure noun (metros, litros)
+PERCT	percent sign (%)
+PPC	Clitic personal pronoun (le, les)
+PPO	Possessive pronouns (mi, su, sus)
+PPX	Clitics and personal pronouns (nos, me, nosotras, te, sí)
+QU	Quantifiers (sendas, cada)
+RP	right parenthesis (")", "]")
+SEMICOLON	semicolon (;)
+UMMX	measure unit (MHz, km, mA)
+VCLIger clitic gerund verb
+VCLIinf clitic infinitive verb
+VCLIfin clitic finite verb
+VEadj	Verb estar. Past participle
+VEfin	Verb estar. Finite
+VEger	Verb estar. Gerund
+VEinf	Verb estar. Infinitive
+VHadj	Verb haber. Past participle
+VHfin	Verb haber. Finite
+VHger	Verb haber. Gerund
+VHinf	Verb haber. Infinitive
+VLadj	Lexical verb. Past participle
+VLfin	Lexical verb. Finite
+VLger	Lexical verb. Gerund
+VLinf	Lexical verb. Infinitive
+VMadj	Modal verb. Past participle
+VMfin	Modal verb. Finite
+VMger	Modal verb. Gerund
+VMinf	Modal verb. Infinitive
+VSadj	Verb ser. Past participle
+VSfin	Verb ser. Finite
+VSger	Verb ser. Gerund
+VSinf	Verb ser. Infinitive

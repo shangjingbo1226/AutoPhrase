@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Set these paths appropriately
+
+BIN=./bin
+CMD=./cmd
+LIB=./lib
+
+GERMANTAGGER=${CMD}/tree-tagger-german
+TAGGER=${BIN}/tree-tagger
+PARFILE=${LIB}/german-utf8.par
+PARFILE2=${LIB}/german-chunker-utf8.par
+FILTER=${CMD}/filter-chunker-output-german.perl
+
+$GERMANTAGGER $* |
+perl -nae 'if ($#F==0){print}else{print "$F[0]-$F[1]\n"}' |
+$TAGGER $PARFILE2 -token -sgml -eps 0.00000001 -hyphen-heuristics -quiet |
+$FILTER |
+$TAGGER -quiet -token -lemma -sgml $PARFILE

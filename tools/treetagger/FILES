@@ -1,0 +1,29 @@
+
+This package contains the TreeTagger, a probabilistic part-of-speech
+tagger developed by Helmut Schmid. All rights are reserved by the
+Institute for Computational Linguistics at the University of
+Stuttgart. The programs have been statically compiled for x86 computers
+running Linux.
+
+Files contained in this package:
+
+- FILES                 this file
+- COPYRIGHT             Copyright notice
+- README                How to use the tagger
+- bin/train-tree-tagger training program
+- bin/tree-tagger       tagger programm
+- bin/separate-punctuation program for tokenization (used by the shell scripts)
+- doc/nemlap94.ps       paper describing the TreeTagger
+- doc/sigdat95.ps       paper describing the TreeTagger
+
+This package can be downloaded at 
+http://www.ims.uni-stuttgart.de/Tools/DecisionTreeTagger.html
+
+Also available at this URL:
+- parameter files
+- shell scripts which convert text to the format required by the tagger
+- papers about the TreeTagger
+
+The shell script package should be unpacked in the same directory as the
+tagger package and the parameter files should be decompressed and moved
+to the lib subdirectory.

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Set these paths appropriately
+
+BIN=./bin
+CMD=./cmd
+LIB=./lib
+
+OPTIONS="-quiet"
+
+TOKENIZER=${CMD}/utf8-tokenize.perl
+MWL=${CMD}/mwl-lookup.perl
+TAGGER=${BIN}/tree-tagger
+ABBR_LIST=${LIB}/spanish-abbreviations
+PARFILE=${LIB}/spanish-utf8.par
+MWLFILE=${LIB}/spanish-mwls-utf8
+
+#$TOKENIZER -a $ABBR_LIST $* |
+# recognition of MWLs
+#$MWL -f $MWLFILE 
+# tagging
+$TAGGER $OPTIONS $PARFILE

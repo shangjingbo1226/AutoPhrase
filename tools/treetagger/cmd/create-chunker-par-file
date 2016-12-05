@@ -1,0 +1,33 @@
+#!/bin/sh
+BIN=/home/tminer/work/tmusers/wiebke/nlptools/treetagger/bin
+CMD=/home/tminer/work/tmusers/wiebke/nlptools/treetagger/cmd
+LIB=/home/tminer/work/tmusers/wiebke/nlptools/treetagger/lib
+
+LEX=$LIB/chunk-lex
+
+if [ $# -ne 2 ] ; then
+	echo "ERROR: Usage: $0 <training data> <name of par file>
+training-data must be of the form:
+Activation-NN	NN/I-NC
+of-IN	IN/B-PC
+the-DT	DT/B-NC
+CD28-NP	NP/I-NC
+surface-NN	NN/I-NC
+receptor-NN	NN/I-NC
+
+like produced by 'cmd/tagger-chunker-english'
+The resulting par file will be stored in:" $LIB
+	exit 0
+fi
+
+DAT=$1
+PAR=$2
+
+echo "Lexicon generation..."
+$CMD/make-chunk-lex.perl  $DAT > $LEX
+$CMD/filter-corpus.perl lex $DAT > tdat
+
+echo "Tagger training..."
+$BIN/train-tree-tagger $LEX $LIB/open-class-chunks tdat $LIB/$PAR -cl 2 -dtg 0.002 -sw 70 -ecw 0.1 -atg 100.0 -st 'SENT/O'
+
+#rm $LEX tdat

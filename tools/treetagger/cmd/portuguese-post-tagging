@@ -1,0 +1,35 @@
+#!/usr/bin/perl -w
+
+binmode STDIN, ':utf8';
+binmode STDOUT, ':utf8';
+use utf8;
+
+$par = shift(@ARGV);
+
+if ($par eq "-yes") {
+    $NP_default_tag = "NP00000"
+}
+if ($par eq "-no") {
+    $NP_default_tag = "NP0"
+}
+
+while (<>) {
+    chop($_);
+
+    if ($_ eq "" || $_ =~ /^<[\w\W]*>$/ || $_ !~ /\t/ )  {
+	next
+    }
+    else {
+
+	($token, $tag, $lemma) = split("\t", $_);
+
+	# identificar um possível nome próprio (desconhecido ou composto) 
+	# e passar lemma a minúscula:
+	if ($lemma =~ /<unknown>/ && $token =~ /^[A-ZÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙÑÇ]/) {
+	    $tag = $NP_default_tag;
+	    $lemma =  lc($token);       
+	}
+	
+	print "$token\t$tag\t$lemma\n";
+    }
+}

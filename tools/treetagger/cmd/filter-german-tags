@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Input format: word tag <lemma>
+# lemma is optional, tag must be in the second position
+
+awk 'BEGIN{OFS=FS="\t";getline;word=$1;tag=$2;lemma=$3}\
+((tag~"V.FIN" || tag~"V.INF")\
+&& $2~"^[$][.,]"\
+&& (word~"[erlu]n$" && word!~"[^aeiou]e*ten$") && word!~".zu.....") \
+{\
+  if (flag||zu)\
+  {\
+    if (tag=="VVFIN") tag="VVINF";\
+    else if (tag=="VAFIN") tag="VAINF";\
+    else if (tag=="VMFIN") tag="VMINF";\
+  }\
+  else\
+  {\
+    if (tag=="VVINF") tag="VVFIN";\
+    else if (tag=="VAINF") tag="VAFIN";\
+    else if (tag=="VMINF") tag="VMFIN";\
+  }\
+}\
+tag~"^V[VAM]FIN$"\
+{\
+   flag=1;\
+}\
+tag~"^[$][.,]"\
+{\
+   flag=0;\
+}\
+\
+{if (tag=="PTKZU") zu=1; else zu=0;}\
+{print word,tag,lemma; word=$1;tag=$2;lemma=$3;}
+END\
+{print word,tag,lemma}' $* |
+sed 's/[ 	]*$//'

@@ -1,0 +1,30 @@
+#!/bin/sh
+BIN=/home/tminer/work/tmusers/wiebke/nlptools/treetagger/bin
+CMD=/home/tminer/work/tmusers/wiebke/nlptools/treetagger/cmd
+LIB=/home/tminer/work/tmusers/wiebke/nlptools/treetagger/lib
+
+LEX=$LIB/pos-lex
+
+if [ $# -ne 2 ] ; then
+	echo "ERROR: Usage: $0 <training data> <name of par file>
+training data must be of the form:
+He
+moved
+to
+New York City	NP
+
+The resulting par file will be stored in:" $LIB
+	exit 0
+fi
+ 
+DAT=$1
+PAR=$2
+
+
+echo "Lexicon generation..."
+$CMD/make-lex.perl  $DAT > $LEX
+
+echo "Tagger training..."
+$BIN/train-tree-tagger $LEX $LIB/open-class-tags $DAT $LIB/$PAR -cl 2 -dtg 0.002 -sw 70 -ecw 0.1 -atg 100.0
+
+#rm $LEX tdat

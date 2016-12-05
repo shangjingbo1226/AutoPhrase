@@ -1,0 +1,282 @@
+
+/***************************************************************************/
+/* How to use the TreeTagger                                               */
+/* Author: Helmut Schmid, University of Stuttgart, Germany                 */
+/***************************************************************************/
+
+
+The TreeTagger consists of two programs: train-tree-tagger is used to 
+create a parameter file from a lexicon and a handtagged corpus. 
+tree-tagger expects a parameter file and a text file as arguments and
+annotates the text with part-of-speech tags. The file formats are
+described below. By default, the programs are located in the ./bin
+sub-directory.
+
+If either of the programs is called without arguments, it will print
+information about its usage.
+
+
+Tagging
+-------
+
+Tagging is done with the tree-tagger program. It requires at least one
+command line argument, the parameter file. If no input file is specified,
+input will be read from stdin. If neither an input file nor an output file
+is specified, the tagger will print to stdout.
+
+tree-tagger {-options-} <parameter file> {<input file> {<output file>}}
+
+Description of the command line arguments:
+
+* <parameter file>: Name of a parameter file which was created with the 
+  train-tree-tagger program.
+* <input file>: Name of the file which is to be tagged. Each token in this 
+  file has to be on a separate line. Tokens may contain blanks. It is possible
+  to override the lexical information contained in the parameter file of the
+  tagger by specifying a list of possible tags after a token. This list has
+  to be preceded by a tab character and the elements are separated by tab 
+  characters. This pretagging feature could be used e.g. to ensure that
+  certain text-specific expressions are tagged properly.
+  Punctuation marks must be on separate lines as well. Clitics (like "'s",
+  "'re", and "'d" in English or "-la" and "-t-elle" in French) should be
+  separated if they were separated in the training data. (The French and
+  English parameter files available by ftp expect separation of clitics).
+  Sample input file:
+    He
+    moved
+    to
+    New York City	NP
+    .
+* <output file>: Name of the file to which the tagger should write its output.
+
+Further optional command line arguments:
+
+* -token: The words/tokens are printed in addition to the POS tags
+* -lemma: Lemmas are printed as well.
+* -sgml: This option instructs the tagger to ignore tokens which start
+  with '<' and end with '>' (SGML tags).
+* -lex <f>: The file <f> contains additional lexicon entries to be used
+  by the tagger. The file format is identical to the format of the lexicon
+  argument of the training program (see below).
+* -no-unknown: If an unknown word is encountered, emit the word form
+  as lemma. This was previously the default behaviour. Now, the default 
+  behaviour is to print "<unknown>" as lemma.
+* -threshold <p>: This option tells the tagger to print all tags of a
+  word with a probability higher than <p> times the largest probability.
+  (The tagger will use a different algorithm in this case and the set of
+  best tags might be different from the tags generated without this
+  option.)
+* -prob: Print tag probabilities (in combination with option -threshold)
+* -pt-with-prob: If this option is specified, then each pretagging tag
+  (see above) has to be followed by a whitespace and a tag probability 
+  value.
+* -pt-with-lemma: If this option is specified, then each pretagging tag
+  (see above) has to be followed by a whitespace and a lemma. Lemmas may 
+  contain blanks.
+  If both -pt-with-prob and -pt-with-lemma have been specified, then each
+  pretagging tag is followed by a probability and a lemma in that order.
+* -hyphen-heuristics: needed for chunking. See below for more information
+  about how to train a chunk parameter file with hyphen-heuristics.
+
+The options below are for advanced users. Please, read the papers on the 
+TreeTagger to fully understand their meaning.
+
+* -proto: If this option is specified, the tagger creates a file named
+  "lexicon-protocol.txt", which contains information about the degree of
+  ambiguity and about the other possible tags of a word form. The part of
+  the lexicon in which the word form has been found is also indicated. 'f'
+  means fullform lexicon and 's' means affix lexicon. 'h' means that the
+  word contains a hyphen and that the part of the word following the
+  hyphen has been found in the fullform lexicon.
+* -eps <epsilon>: Value which is used to replace zero lexical frequencies.
+  This is the case if a word/tag pair is contained in the lexicon but not
+  in the training corpus. The choice of this parameter has only minor
+  influence on the tagging accuracy.
+* -base: If this option is specified, only lexical information is used
+  for tagging but no contextual information about the preceding tags.
+  This option is only useful in order to obtain a baseline result
+  to which to compare the actual tagger output.
+
+
+
+Training
+--------
+
+Training is done with the *train-tree-tagger* program. It expects at least
+four command line arguments which are described below.
+
+train-tree-tagger {options} <lexicon> <open class file> <input file> <output file>
+
+Description of the command line arguments:
+
+* <lexicon>: name of a file which contains the fullform lexicon. Each line 
+  of the lexicon corresponds to one word form and contains the word form 
+  and a sequence of tag-lemma pairs. Each tag is preceded by a tab character
+  and each lemma is preceded by a blank or tab character.
+  Example:
+
+aback	RB aback
+abacuses	NNS abacus
+abandon	VB abandon	VBP abandon
+abandoned	JJ abandoned	VBD abandon	VBN abandon
+abandoning	VBG abandon
+
+  Remark: The tagger doesn't need the lemmas for tagging actually. If
+  you do not have the lemma information or if you do not plan to
+  annotate corpora with lemmas, you can replace the lemma with a dummy
+  value, e.g. "-".
+
+  You can use the Perl script make-lex.perl as follows in order to
+  create a tagger lexicon from the training corpus:
+    cmd/make-lex.perl corpus > lexicon
+
+  If you have additional lexicon entries stored in a separate file "lex"
+  with entries like this (The POS tag is preceded by a tab character.)
+    aback   RB aback
+    aback   RP aback
+    abacs   NNS abac
+  you can include them as follows:  cmd/make-lex.perl corpus lex > lexicon
+
+  If train-tree-tagger complains about unknown tags, just add another
+  entry to the lexicon with the respective POS tag.
+
+* <open class file>: name of a file which contains a list of open class tags
+  i.e. possible tags of unknown word forms separated by whitespace.
+  The tagger will use this information when it encounters unknown words,
+  i.e. words which are not contained in the lexicon.
+  Example: (for Penn Treebank tagset)
+
+FW JJ JJR JJS NN NNS NP NPS RB RBR RBS VB VBD VBG VBN VBP VBZ
+
+* <input file>: name of a file which contains tagged training data. The data
+  must be in one-word-per-line format. This means that each line contains 
+  one token and one tag in that order separated by a tabulator. 
+  Punctuation marks are considered as tokens and must be tagged as well.
+  The file should neither contain empty lines nor untagged SGML markup.
+  Example:
+
+Pierre  NP
+Vinken  NP
+,       ,
+61      CD
+years   NNS
+
+* <output file>: name of the file in which the resulting tagger parameters 
+  are stored.
+
+The following parameters are optional. Read the papers on the TreeTagger to 
+fully understand their meaning.
+
+* -st <sent. tag>: the end-of-sentence part-of-speech tag, i.e. the tag which
+  is assigned to sentence punctuation like ".", "!", "?". 
+  Default is "SENT". You have to use this option, if your tag for sentence
+  punctuation is not "SENT". If you have more than one such tag, choose the
+  most frequent one.
+* -utf8 assume that the data is encoded with UTF8
+* -cl <context length>: number of preceding words forming the statistical
+  context. The default is 2 which corresponds to a trigram context. For
+  small training corpora and/or large tagsets, it could be useful to reduce
+  this parameter to 1.
+* -dtg <min. decision tree gain>: Threshold - If the information gain at a 
+  leaf node of the decision tree is below this threshold, the node is deleted.
+* -sw <weight>: A smoothing parameter, which determines how much the
+  probability distribution of some decision tree node is smoothed with the
+  probability distribution of the parent node.
+* -ecw <eq. class weight>: weight of the equivalence class based probability
+  estimates.
+* -atg <affix tree gain> Threshold - If the information gain at a leaf of an
+  affix tree is below this threshold, it is deleted. The default is 1.2.
+
+The accuracy of the TreeTagger usually improves, if different settings
+of the above parameters are tested and the best combination is chosen.
+
+
+Caveat: Make sure that the lexicon and the training corpus contain no
+extra blanks. If the word form, for instance, is followed by a blank
+and a tab character, the blank will be considered part of the word.
+
+The script 'cmd/create-pos-parameter-file' can be used to train a 
+parameter file, provided the file: 'lib/open-class-tags' exists.
+The script creates a lexicon and a parameter file
+that both will be stored in the lib-directory.
+
+
+Training a parameter file for chunking
+---------------------------------------
+
+(This section of the README file was created by Wiebke Wagner.)
+
+Training is done with the *train-tree-tagger* program just like the training
+of part-of-speech parameter files. The input files differ (see below).
+
+train-tree-tagger {options} <lexicon> <open class file> <input file> <output file>
+
+Description of the command line arguments:
+
+* <lexicon>: name of a file which contains the fullform lexicon. Each line 
+  of the lexicon corresponds to one word form and contains the word form 
+  with its pos-tag and a sequence of chunktag-lemma pairs. Since there is
+  no lemma for a string containing a word and its pos, lemma is just a 
+  dummy-placeholder. Each chunktag 
+  is preceded by a tab character and each dummy-lemma is preceded by a blank or tab character.
+  Example:
+
+Abs-NP  NP/I-NC #       NP/B-NC #
+Academic-NP     NP/I-NC #
+Activated-VVN   VBN/B-VC #      VBN/B-NC #
+Activation-NN   NN/I-NC #       NN/B-NC #
+VB      VB/I-VC #
+
+  The lexicon must contain specific entries that contain a hypen 
+  ('WORD-POS	POS/IOB DUMMY-LEMMA') and general entries without a hypen 
+  ('POS	   POS/IOB DUMMY-LEMMMA)'. The hypen-heuristics enables the 
+  program to select the general entry if no specific entry is available.
+
+  You can use the Perl script make-chunk-lex.perl as follows in order to
+  create a tagger-chunker lexicon from the training corpus:
+  'cmd/make-chunk-lex.perl' corpus > chunker-lexicon
+
+  Attention: if 'train-tree-tagger' shows the error message:
+  'ERROR: Sentence punctuation tag "SENT" is not in lexicon!' 
+  add the option: [-st 'SENT/O'] to the system call.
+ 
+  If train-tree-tagger complains about unknown tags, just add another
+  entry to the lexicon with the respective POS tag.
+
+* <open class file>: name of a file which contains only the dummy entry:
+  NN/B-NC. If there are general entries in the lexicon for every 
+  word class, and if the hyphen heuristic is activated  no tags 
+  have to be guessed.
+
+* <input file>: name of a file which contains training data annotated
+  with part-of-speech tags  and chunk tags. The data
+  must be in one-word-per-line format. This means that each line contains 
+  one token with its mark-up: 
+  WORD-POS	POS/IOB DUMMY-LEMMA
+  The file should neither contain empty lines nor untagged SGML markup.
+  Example:
+
+Activation-NN   NN/I-NC
+of-IN   IN/B-PC
+the-DT  DT/B-NC
+CD28-NP NP/I-NC
+surface-NN      NN/I-NC
+
+* <output file>: name of the file in which the resulting tagger parameters 
+  are stored.
+
+The optional parameters like for training a part-of-speech parameter file
+
+The accuracy of the TreeTagger usually improves, if different settings
+of the above parameters are tested and the best combination is chosen.
+
+Caveat: Make sure that the lexicon and the training corpus contain no
+extra blanks. If the word form, for instance, is followed by a blank
+and a tab character, the blank will be considered part of the word.
+
+The script 'cmd/create-chunk-parameter-file' can be used to train a chunk
+parameter file, provided the file: 'lib/open-class-chunks' exists and 
+contains the dummy entry: 
+NN/B-NC  
+The script creates a lexicon and a parameter file
+that both will be stored in the lib-directory.

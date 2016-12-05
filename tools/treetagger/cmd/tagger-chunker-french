@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# The training corpus had 17739 sentences, 524004 tokens for 4266 types taken from the French Treebank. Information on the phrasal tagsets can be found at http://www.llf.cnrs.fr/Gens/Abeille/French-Treebank-fr.php
+
+# Set these paths appropriately
+
+BIN=./bin
+CMD=./cmd
+LIB=./lib
+
+OPTIONS1="-token -lemma -sgml"
+OPTIONS2="-token -sgml -eps 0.00000001 -hyphen-heuristics -quiet"
+
+TAGGER=${BIN}/tree-tagger
+TOKENIZER=${CMD}/utf8-tokenize.perl
+ABBR_LIST=${LIB}/french-abbreviations-utf8
+PARFILE1=${LIB}/french-utf8.par
+PARFILE2=${LIB}/french-chunker-utf8.par
+FILTER=${CMD}/filter-chunker-output-french.perl 
+FILTERCoordinate=${CMD}/filter-coordinate-output.perl
+WRITE_LEMMA=${CMD}/chunker-write-lemma.perl
+READ_LEMMA=${CMD}/chunker-read-lemma.perl
+
+# tagging with Stein's tagger
+$TOKENIZER -f -a $ABBR_LIST $* |
+
+# external lexicon lookup
+$CMD/lookup.perl $LIB/french-lexicon.txt |
+
+$TAGGER $OPTIONS1 $PARFILE1 |
+
+$WRITE_LEMMA |
+
+# chunking
+$TAGGER $PARFILE2 $OPTIONS2 |
+
+$READ_LEMMA |
+
+# filtering
+perl -nae '$F[1]=~s/-PP/-PC/; if (/^<.+>\s*$/) {print;} else {print "$F[0]\t$F[1]\t$F[2]\n"}' |
+
+$FILTER |
+
+perl -nae 's/<(\/)?PC>/<${1}PP>/; if (/^<.+>\s*$/) {print;} else {print "$F[0]\t$F[1]\t$F[2]\n"}' |
+$FILTERCoordinate |
+perl -nae 'if (!/<XX>/) {print}'
+
+

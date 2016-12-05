@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Set these paths appropriately
+
+BIN=./bin
+CMD=./cmd
+LIB=./lib
+
+TOKENIZER="perl -I ${CMD} ${CMD}/segment-zh.perl"
+
+TAGGER=${BIN}/tree-tagger
+PARFILE=${LIB}/zh.par
+
+# put all on one line
+# cat $* |
+# do tokenization
+# $TOKENIZER ${CMD}/chinese-3c.utf8 ${CMD}/chinese-2c.utf8 |
+# tagging
+$TAGGER $PARFILE -quiet

@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# Set these paths appropriately
+
+BIN=./bin
+CMD=./cmd
+LIB=./lib
+
+OPTIONS="-token -lemma -sgml"
+
+TOKENIZER=${CMD}/utf8-tokenize.perl
+MWL=${CMD}/mwl-lookup.perl
+TAGGER=${BIN}/tree-tagger
+ABBR_LIST=${LIB}/spanish-abbreviations
+PARFILE=${LIB}/spanish-utf8.par
+MWLFILE=${LIB}/spanish-mwls-utf8
+
+PARFILE2=${LIB}/spanish-chunker-utf8.par
+FILTER=${CMD}/filter-chunker-output.perl
+
+$TOKENIZER -a $ABBR_LIST $* |
+# recognition of MWLs
+$MWL -f $MWLFILE |
+# tagging
+$TAGGER $OPTIONS $PARFILE | 
+perl -ne 'my($w,$t,$l)=split(/\t/);if(defined $t){print "$w-$t\n"}else{print}' |
+$TAGGER $PARFILE2 -token -sgml -eps 0.00000001 -hyphen-heuristics -quiet |
+$FILTER |
+$TAGGER $OPTIONS $PARFILE

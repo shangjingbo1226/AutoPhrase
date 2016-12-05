@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Set these paths appropriately
+
+BIN=./bin
+CMD=./cmd
+LIB=./lib
+
+OPTIONS="-token -lemma -sgml"
+
+TOKENIZER=${CMD}/utf8-tokenize.perl
+TAGGER=${BIN}/tree-tagger
+ABBR_LIST=${LIB}/romanian-abbreviations
+PARFILE=${LIB}/romanian-utf8.par
+
+$TOKENIZER -r -a $ABBR_LIST $* |
+${CMD}/split-romanian.perl ${LIB}/romanian-tokens |
+$TAGGER $OPTIONS $PARFILE

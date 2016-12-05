@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Set these paths appropriately
+
+BIN=./bin
+CMD=./cmd
+LIB=./lib
+
+OPTIONS="-pt-with-lemma -quiet"
+
+TOKENIZER=${CMD}/utf8-tokenize.perl
+TAGGER=${BIN}/tree-tagger
+ABBR_LIST=${LIB}/german-abbreviations-utf8
+PARFILE=${LIB}/german-utf8.par
+LEXFILE=${LIB}/german-lexicon-utf8.txt
+FILTER=${CMD}/filter-german-tags
+
+# $TOKENIZER -a $ABBR_LIST $* |
+# external lexicon lookup
+perl $CMD/lookup.perl $LEXFILE |
+# tagging
+$TAGGER $OPTIONS $PARFILE  | 
+# error correction
+$FILTER
