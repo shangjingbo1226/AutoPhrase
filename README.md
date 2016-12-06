@@ -28,13 +28,14 @@ Please cite the following two papers if you are using our tools. Thanks!
     parallelization are implemented, which lead to both running time speedup and
     memory saving.
 
-## Related GitHub Repository
+## Related GitHub Repositories
 
 *   [SegPhrase](https://github.com/shangjingbo1226/SegPhrase)
+*	[SegPhrase-MultiLingual](https://github.com/remenberl/SegPhrase-MultiLingual)
 
 ## Requirements
 
-Linux or MacOS with g++ and java installed.
+Linux or MacOS with g++ and Java installed.
 
 Ubuntu:
 
@@ -45,11 +46,6 @@ MacOS:
 
 *   g++ 6 `$ brew install gcc6`
 *   Java 8 `$ brew install java8`
-
-## Build
-
-The C++ part is encoded in the Makefile while the Java part is done in the bash
-script.
 
 ## Default Run
 
