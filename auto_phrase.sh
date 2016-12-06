@@ -1,10 +1,15 @@
-FIRST_RUN=1
 RAW_TRAIN=data/DBLP.txt
-ENABLE_POS_TAGGING=1
+FIRST_RUN=1
+
+MIN_SUP=30
 THREAD=10
+
+### Begin: Suggested Parameters ###
+ENABLE_POS_TAGGING=1
 LABEL_METHOD=ByRandom
 MAX_POSITIVES=100
 NEGATIVE_RATIO=7
+### End: Suggested Parameters ###
 
 green=`tput setaf 2`
 reset=`tput sgr0`
@@ -81,20 +86,20 @@ echo ${green}===Segphrasing===${reset}
 
 if [ $ENABLE_POS_TAGGING -eq 1 ]; then
 	time ./bin/segphrase_train \
-        --verbose \
         --pos_tag \
         --thread $THREAD \
         --pos_prune data/BAD_POS_TAGS.txt \
         --label_method $LABEL_METHOD \
         --max_positives $MAX_POSITIVES \
-        --negative_ratio $NEGATIVE_RATIO
+        --negative_ratio $NEGATIVE_RATIO \
+        --min_sup $MIN_SUP
 else
 	time ./bin/segphrase_train \
-        --verbose \
         --thread $THREAD \
         --label_method $LABEL_METHOD \
         --max_positives $MAX_POSITIVES \
-        --negative_ratio $NEGATIVE_RATIO
+        --negative_ratio $NEGATIVE_RATIO \
+        --min_sup $MIN_SUP
 fi
 
 ### END Segphrasing ###
