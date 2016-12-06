@@ -10,10 +10,10 @@ Please cite the following two papers if you are using our tools. Thanks!
 
 ## New Features
 
-* No Human Effort. We are using the distant training based on the quality phrases in knowledge bases to generate labels.
-* Support Multiple Languages: English, Spanish, and Chinese. The language in the input will be automatically detected.
-* High Accuracy. Precision and recall are improved over our previous work SegPhrase, because context-aware phrasal segmentation considering POS tags has been developed and single-word phrases are modeled systematiaclly. 
-* High Efficiency. A better indexing and an almost lock-free parallelization are implemented, which lead to both running time speedup and memory saving.
+* **No Human Effort**. We are using the distant training based on the quality phrases in knowledge bases to generate labels.
+* **Support Multiple Languages: English, Spanish, and Chinese**. The language in the input will be automatically detected.
+* **High Accuracy**. Precision and recall are improved over our previous work SegPhrase, because context-aware phrasal segmentation considering POS tags has been developed and single-word phrases are modeled systematiaclly. 
+* **High Efficiency**. A better indexing and an almost lock-free parallelization are implemented, which lead to both running time speedup and memory saving.
 
 ## Related GitHub Repository
 
