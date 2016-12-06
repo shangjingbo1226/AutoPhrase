@@ -1,6 +1,5 @@
 # AutoPhrase: A Unified Framework for Automated Quality Phrase Mining from Massive Text Corpora
 
-
 ## Publications
 
 Please cite the following two papers if you are using our tools. Thanks!
@@ -8,6 +7,17 @@ Please cite the following two papers if you are using our tools. Thanks!
 * Jingbo Shang, Jialu Liu, Meng Jiang, Xiang Ren, Jiawei Han, "**AutoPhrase: A Unified Framework for Automated Quality Phrase Mining from Massive Text Corpora**", VLDB 2017, under review.
 
 * Jialu Liu\*, Jingbo Shang\*, Chi Wang, Xiang Ren and Jiawei Han, "**[Mining Quality Phrases from Massive Text Corpora](http://jialu.cs.illinois.edu/paper/sigmod2015-liu.pdf)**”, Proc. of 2015 ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'15), Melbourne, Australia, May 2015. (\* equally contributed, [slides](http://jialu.cs.illinois.edu/paper/sigmod2015-liu-slides.pdf))
+
+## New Features
+
+* No Human Effort. We are using the distant training based on the quality phrases in knowledge bases to generate labels.
+* Support Multiple Languages: English, Spanish, and Chinese. The language in the input will be automatically detected.
+* High Accuracy. Precision and recall are improved over our previous work SegPhrase, because context-aware phrasal segmentation considering POS tags has been developed and single-word phrases are modeled systematiaclly. 
+* High Efficiency. A better indexing and an almost lock-free parallelization are implemented, which lead to both running time speedup and memory saving.
+
+## Related GitHub Repository
+
+* [SegPhrase](https://github.com/shangjingbo1226/SegPhrase)
 
 ## Requirements
 
