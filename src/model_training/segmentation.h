@@ -46,7 +46,9 @@ void constructTrie() {
         }
         trie[u].id = i;
     }
-    cerr << "# of trie nodes = " << trie.size() << endl;
+    if (INTERMEDIATE) {
+        cerr << "# of trie nodes = " << trie.size() << endl;
+    }
 }
 
 class Segmentation
@@ -444,7 +446,9 @@ public:
         connect = backup;
         getDisconnect();
 
-        cerr << "Energy = " << energy << endl;
+        if (INTERMEDIATE) {
+            cerr << "Energy = " << energy << endl;
+        }
         return energy;
     }
 
@@ -499,7 +503,9 @@ public:
             }
         }
         getDisconnect();
-        cerr << "Energy = " << energy << endl;
+        if (INTERMEDIATE) {
+            cerr << "Energy = " << energy << endl;
+        }
         return energy;
     }
 };

@@ -270,7 +270,9 @@ namespace Features
     }
 
     int recognize(vector<Pattern> &truth) {
-        fprintf(stderr, "Loaded Truth = %d\n", truth.size());
+        if (INTERMEDIATE) {
+            fprintf(stderr, "Loaded Truth = %d\n", truth.size());
+        }
         int truthCnt = 0;
         for (int i = 0; i < truth.size(); ++ i) {
             if (pattern2id.count(truth[i].hashValue)) {
@@ -279,7 +281,9 @@ namespace Features
                 patterns[id].label = truth[i].label;
             }
         }
-        fprintf(stderr, "Recognized Truth = %d\n", truthCnt);
+        if (INTERMEDIATE) {
+            fprintf(stderr, "Recognized Truth = %d\n", truthCnt);
+        }
         return truthCnt;
     }
 

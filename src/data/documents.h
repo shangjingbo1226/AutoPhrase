@@ -104,7 +104,9 @@ namespace Documents
                 }
             }
         }
-        cerr << "# of stopwords = " << stopwords.size() << endl;
+        if (INTERMEDIATE) {
+            cerr << "# of loaded stop words = " << stopwords.size() << endl;
+        }
         fclose(in);
     }
 
@@ -126,7 +128,9 @@ namespace Documents
                 }
             }
             cerr << "# of total tokens = " << totalTokens << endl;
-            cerr << "# of total word tokens = " << totalWordTokens << endl;
+            if (INTERMEDIATE) {
+                cerr << "# of total word tokens = " << totalWordTokens << endl;
+            }
             cerr << "max word token id = " << maxTokenID << endl;
             fclose(in);
         }
@@ -244,7 +248,7 @@ namespace Documents
         }
 
         cerr << "# of documents = " << docs << endl;
-        cerr << "# of POS tags = " << posTag2id.size() << endl;
+        cerr << "# of distinct POS tags = " << posTag2id.size() << endl;
     }
 
     inline void splitIntoSentences() {
@@ -257,7 +261,9 @@ namespace Documents
             }
         }
         sentences.shrink_to_fit();
-        cerr << "The number of sentences = " << sentences.size() << endl;
+        if (INTERMEDIATE) {
+            cerr << "The number of sentences = " << sentences.size() << endl;
+        }
     }
 
 };

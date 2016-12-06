@@ -75,7 +75,9 @@ void dumpSegmentationModel(const string& filename)
         }
     }
     Binary::write(out, cnt);
-    cerr << "# of patterns dumped = " << cnt << endl;
+    if (INTERMEDIATE) {
+        cerr << "# of phrases dumped = " << cnt << endl;
+    }
     for (int i = 0; i < patterns.size(); ++ i) {
         if (patterns[i].size() > 1 && patterns[i].currentFreq > 0 || patterns[i].size() == 1 && patterns[i].currentFreq > 0 && unigrams[patterns[i].tokens[0]] >= MIN_SUP) {
             patterns[i].dump(out);

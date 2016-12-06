@@ -19,11 +19,13 @@ int main(int argc, char* argv[])
     sscanf(argv[1], "%d", &NTHREADS);
     omp_set_num_threads(NTHREADS);
 
+    cerr << "Loading data..." << endl;
     // load stopwords, documents, and capital information
     Documents::loadStopwords(STOPWORDS_FILE);
     Documents::loadAllTrainingFiles(TRAIN_FILE, POS_TAGS_FILE, TRAIN_CAPITAL_FILE);
     Documents::splitIntoSentences();
 
+    cerr << "Mining frequent phrases..." << endl;
     FrequentPatternMining::mine(MIN_SUP, MAX_LEN);
     // check the patterns
     if (INTERMEDIATE) {
@@ -35,22 +37,21 @@ int main(int argc, char* argv[])
     }
 
     // feature extraction
+    cerr << "Extracting features..." << endl;
     vector<string> featureNames;
     vector<vector<double>> features = Features::extract(featureNames);
 
     vector<string> featureNamesUnigram;
     vector<vector<double>> featuresUnigram = Features::extractUnigram(featureNamesUnigram);
 
-    cerr << "feature extraction done!" << endl;
-
     vector<Pattern> truth;
     if (LABEL_FILE != "") {
-        cerr << "=== Load Existing Labels ===" << endl;
+        cerr << "Loading existing labels..." << endl;
         truth = Label::loadLabels(LABEL_FILE);
         int recognized = Features::recognize(truth);
     } else {
         // generate labels
-        cerr << "=== Generate Labels ===" << endl;
+        cerr << "Generating Labels..." << endl;
         // multi-words
         truth = Label::generate(features, featureNames, ALL_FILE, QUALITY_FILE);
         int recognized = Features::recognize(truth);
@@ -74,7 +75,10 @@ int main(int argc, char* argv[])
 
     // SegPhrase, +, ++, +++, ...
     for (int iteration = 0; iteration < ITERATIONS; ++ iteration) {
-        fprintf(stderr, "Feature Matrix = %d X %d\n", features.size(), features.back().size());
+        if (INTERMEDIATE) {
+            fprintf(stderr, "Feature Matrix = %d X %d\n", features.size(), features.back().size());
+        }
+        cerr << "Estimating Phrase Quality..." << endl;
         predictQuality(patterns, features, featureNames);
         predictQualityUnigram(patterns, featuresUnigram, featureNamesUnigram);
 
@@ -87,12 +91,15 @@ int main(int argc, char* argv[])
             Dump::dumpResults(filename);
         }
 
+        cerr << "Segmenting..." << endl;
         if (!ENABLE_POS_TAGGING) {
-            cerr << "[Length Penalty Mode]" << endl;
+            if (INTERMEDIATE) {
+                cerr << "[Length Penalty Mode]" << endl;
+            }
             double penalty = EPS;
             if (true) {
                 // Binary Search for Length Penalty
-                double lower = EPS, upper = 200;
+                double lower = EPS, upper = 2000;
                 for (int _ = 0; _ < 10; ++ _) {
                     penalty = (lower + upper) / 2;
                     Segmentation segmentation(penalty);
@@ -114,13 +121,17 @@ int main(int argc, char* argv[])
                         upper = penalty;
                     }
                 }
+            }
+            if (INTERMEDIATE) {
                 cerr << "Length Penalty = " << penalty << endl;
             }
             // Running Segmentation
             Segmentation segmentation(penalty);
             segmentation.rectifyFrequency(Documents::sentences);
         } else {
-            cerr << "[POS Tags Mode]" << endl;
+            if (INTERMEDIATE) {
+                cerr << "[POS Tags Mode]" << endl;
+            }
             if (true) {
                 Segmentation segmentation(ENABLE_POS_TAGGING);
                 double last = 1e100;
@@ -145,7 +156,7 @@ int main(int argc, char* argv[])
 
         if (iteration + 1 < ITERATIONS) {
             // rectify the features
-            cerr << "Rectify Features..." << endl;
+            cerr << "Rectifying features..." << endl;
             Label::removeWrongLabels();
 
             /*
@@ -177,8 +188,11 @@ int main(int argc, char* argv[])
         }
     }
 
+    cerr << "Dumping results..." << endl;
     Dump::dumpResults("tmp/final_quality");
     Dump::dumpSegmentationModel("results/segmentation.model");
+
+    cerr << "Done." << endl;
 
     return 0;
 }

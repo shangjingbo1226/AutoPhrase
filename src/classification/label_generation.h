@@ -253,8 +253,10 @@ inline vector<Pattern> generate(vector<vector<double>> &features, vector<string>
         negatives.push_back(iter.second);
     }
 
-    fprintf(stderr, "matched positives = %d\n", positives.size());
-    fprintf(stderr, "matched negatives = %d\n", negatives.size());
+    if (INTERMEDIATE) {
+        fprintf(stderr, "matched positives = %d\n", positives.size());
+        fprintf(stderr, "matched negatives = %d\n", negatives.size());
+    }
 
     if (LABEL_METHOD == "ByBootstrap") {
         return generateBootstrap(features, featureNames, positives, negatives);
@@ -375,8 +377,8 @@ inline vector<Pattern> generate(vector<vector<double>> &features, vector<string>
         ++ cntNegatives;
     }
 
-    fprintf(stderr, "selected positives = %d\n", cntPositives);
-    fprintf(stderr, "selected negatives = %d\n", cntNegatives);
+    fprintf(stderr, "\t[multi-word phrase] # of positive labels = %d\n", cntPositives);
+    fprintf(stderr, "\t[multi-word phrase] # of negative labels = %d\n", cntNegatives);
 
     return ret;
 }
@@ -408,8 +410,10 @@ inline vector<Pattern> generateUnigram(vector<vector<double>> &features, string 
         negatives.push_back(iter.second);
     }
 
-    fprintf(stderr, "matched positives = %d\n", positives.size());
-    fprintf(stderr, "matched negatives = %d\n", negatives.size());
+    if (INTERMEDIATE) {
+        fprintf(stderr, "matched positives = %d\n", positives.size());
+        fprintf(stderr, "matched negatives = %d\n", negatives.size());
+    }
 
     srand(19910724);
     random_shuffle(positives.begin(), positives.end());
@@ -441,8 +445,8 @@ inline vector<Pattern> generateUnigram(vector<vector<double>> &features, string 
         ++ cntNegatives;
     }
 
-    fprintf(stderr, "selected positives = %d\n", cntPositives);
-    fprintf(stderr, "selected negatives = %d\n", cntNegatives);
+    fprintf(stderr, "\t[single-word phrase] # of positive labels = %d\n", cntPositives);
+    fprintf(stderr, "\t[single-word phrase] # of negative labels = %d\n", cntNegatives);
 
     return ret;
 }

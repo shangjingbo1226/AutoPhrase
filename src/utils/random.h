@@ -67,7 +67,7 @@ static vector<RandomNumberGenerator> rng;
 void initialize()
 {
     int nthread = omp_get_max_threads();
-cerr << "# of threads = " << nthread << endl;
+//cerr << "# of threads = " << nthread << endl;
     rng.resize(nthread);
     RandomNumberGenerator seeds;
     seeds.init(19910724);

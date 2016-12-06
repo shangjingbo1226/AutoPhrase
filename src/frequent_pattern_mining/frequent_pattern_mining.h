@@ -184,8 +184,11 @@ namespace FrequentPatternMining
                 cntUnigrams += noInitial[i];
                 cntExpansions += noExpansion[i];
             }
-            cerr << "# of forbidden initial pos tags = " << cntUnigrams << endl;
-            cerr << "# of forbidden expanded pos tags = " << cntExpansions << endl;
+
+            if (INTERMEDIATE) {
+                cerr << "# of forbidden initial pos tags = " << cntUnigrams << endl;
+                cerr << "# of forbidden expanded pos tags = " << cntExpansions << endl;
+            }
         }
 
         id2ends.clear();
@@ -229,11 +232,15 @@ namespace FrequentPatternMining
                 totalOcc += unigrams[token] >= MIN_SUP;
             }
         }
-        cerr << "unigrams inserted" << endl;
+        if (INTERMEDIATE) {
+            cerr << "unigrams inserted" << endl;
+        }
 
         PATTERN_ID_TYPE last = 0;
         for (int len = 1; len <= LENGTH_THRESHOLD && last < patterns.size(); ++ len) {
-            cerr << "# of frequent patterns of length-" << len << " = "  << patterns.size() - last + 1 << endl;
+            if (INTERMEDIATE) {
+                cerr << "# of frequent patterns of length-" << len << " = "  << patterns.size() - last + 1 << endl;
+            }
             PATTERN_ID_TYPE backup = patterns.size();
 
             unordered_map<ULL, TOTAL_TOKENS_TYPE> threadFreq[NTHREADS];
@@ -317,8 +324,10 @@ namespace FrequentPatternMining
         }
         id2ends.shrink_to_fit();
 
-        cerr << "# of frequent patterns = " << patterns.size() << endl;
-        cerr << "total occurrence = " << totalOcc << endl;
+        cerr << "# of frequent phrases = " << patterns.size() << endl;
+        if (INTERMEDIATE) {
+            cerr << "total occurrence = " << totalOcc << endl;
+        }
 
         for (int i = 0; i < patterns.size(); ++ i) {
             assert(patterns[i].currentFreq == id2ends[i].size() || id2ends[i].size() == 0);
