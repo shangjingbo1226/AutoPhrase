@@ -36,7 +36,7 @@ mkdir -p tmp
 mkdir -p results
 
 if [ $RAW_TRAIN == "data/DBLP.txt" ] && [ ! -e data/DBLP.txt ]; then
-    echo ${green}===Downloading dataset===${reset}
+    echo ${green}===Downloading Toy Dataset===${reset}
     curl http://dmserv2.cs.illinois.edu/data/DBLP.txt.gz --output data/DBLP.txt.gz
     gzip -d data/DBLP.txt.gz -f
 fi
@@ -82,7 +82,7 @@ fi
 
 ### END Part-Of-Speech Tagging ###
 
-echo ${green}===Segphrasing===${reset}
+echo ${green}===AutoPhrasing===${reset}
 
 if [ $ENABLE_POS_TAGGING -eq 1 ]; then
 	time ./bin/segphrase_train \
@@ -102,7 +102,7 @@ else
         --min_sup $MIN_SUP
 fi
 
-### END Segphrasing ###
+### END AutoPhrasing ###
 
 echo ${green}===Generating Output===${reset}
 java $TOKENIZER -m translate -i tmp/final_quality_multi-words.txt -o results/AutoPhrase_multi-words.txt -t $TOKEN_MAPPING -c N -thread $THREAD
