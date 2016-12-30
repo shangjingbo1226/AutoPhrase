@@ -45,7 +45,7 @@ Ubuntu:
 MacOS:
 
 *   g++ 6 `$ brew install gcc6`
-*   Java 8 `$ brew install java8`
+*   Java 8 `$ brew update; brew tap caskroom/cask; brew install Caskroom/cask/java`
 
 ## Default Run
 

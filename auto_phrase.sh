@@ -1,8 +1,9 @@
+#!/bin/bash
 RAW_TRAIN=data/DBLP.txt
 FIRST_RUN=1
 
 MIN_SUP=30
-THREAD=10
+THREAD=4
 
 ### Begin: Suggested Parameters ###
 ENABLE_POS_TAGGING=1
