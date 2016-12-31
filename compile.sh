@@ -6,7 +6,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     if [[ $(uname -r) == 2.6* ]]; then
         cp tools/treetagger/bin/tree-tagger-linux-old tools/treetagger/bin/tree-tagger
     else
-            cp tools/treetagger/bin/tree-tagger-linux tools/treetagger/bin/tree-tagger
+        cp tools/treetagger/bin/tree-tagger-linux tools/treetagger/bin/tree-tagger
     fi
 fi
 if [ ! -e tools/tokenizer/build/Tokenizer.class ]; then
