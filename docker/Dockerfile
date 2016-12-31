@@ -19,18 +19,18 @@ RUN \
     apt-get update && apt-get install -y --force-yes g++
 
 RUN \
-    echo "===> install unzip, make, curl, perl" && \
-    apt-get update && apt-get install -y --force-yes unzip make curl perl
+    echo "===> install make, curl, perl" && \
+    apt-get update && apt-get install -y --force-yes make curl perl
 
-COPY autophrase.zip /
+COPY autophrase.tar.gz /
+
 RUN \
-    unzip /autophrase.zip && \
-    mv /AutoPhrase-master /autophrase
+    echo "===> make" &&\
+    cd autophrase && make
 
 RUN \
     echo "===> clean up..."  && \
-    rm /autophrase.zip && \
-    apt-get remove --purge -y --force-yes unzip && \
+    apt-get remove --purge -y --force-yes make gcc && \
     rm -rf /var/cache/oracle-jdk8-installer  && \
     apt-get clean  && \
     rm -rf /var/lib/apt/lists/*
