@@ -4,3 +4,4 @@ rm master.zip
 mv AutoPhrase-master autophrase
 tar -zcvf autophrase.tar.gz autophrase
 rm -r autophrase
+# sudo docker build -t remenberl/autophrase .

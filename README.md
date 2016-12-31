@@ -97,3 +97,30 @@ THREAD=10
 ```
 
 You can also specify how many threads can be used for AutoPhrase
+
+## Docker
+
+###Default Run
+
+```
+sudo docker run -v $PWD/results:/autophrase/results -it \
+    -e FIRST_RUN=1 -e ENABLE_POS_TAGGING=1 \
+    -e MIN_SUP=30 -e THREAD=10 \
+    remenberl/autophrase
+
+./autophrase.sh
+```
+
+The results will be available in the results folder.
+
+###User Specified Input
+Assuming the path to input file is ./data/input.txt.
+```
+sudo docker run -v $PWD/data:/autophrase/data -v $PWD/results:/autophrase/results -it \
+    -e RAW_TRAIN=data/input.txt \
+    -e FIRST_RUN=1 -e ENABLE_POS_TAGGING=1 \
+    -e MIN_SUP=30 -e THREAD=10 \
+    remenberl/autophrase
+
+./autophrase.sh
+```
