@@ -3,12 +3,10 @@ RAW_TRAIN=${RAW_TRAIN:- data/DBLP.txt}
 FIRST_RUN=${FIRST_RUN:- 1}
 ENABLE_POS_TAGGING=${ENABLE_POS_TAGGING:- 1}
 MIN_SUP=${MIN_SUP:- 30}
-THREAD=${THREAD:- 4}
+THREAD=${THREAD:- 10}
 
 ### Begin: Suggested Parameters ###
-LABEL_METHOD=ByRandom
 MAX_POSITIVES=100
-NEGATIVE_RATIO=7
 ### End: Suggested Parameters ###
 
 green=`tput setaf 2`
