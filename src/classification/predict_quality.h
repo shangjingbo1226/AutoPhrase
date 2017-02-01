@@ -28,6 +28,7 @@ void predictQuality(vector<Pattern> &patterns, vector<vector<double>> &features,
     RandomForest *solver = new RandomForest();
     RANDOM_FEATURES = 4;
     RANDOM_POSITIONS = 4;
+    K_OUT_OF_N = MAX_POSITIVES;
 
     // fprintf(stderr, "[multi-word phrase] phrase quality estimation...\n");
     solver->train(trainX, trainY, 1000, 1, 100, featureNames);
@@ -71,6 +72,7 @@ void predictQualityUnigram(vector<Pattern> &patterns, vector<vector<double>> &fe
     RandomForest *solver = new RandomForest();
     RANDOM_FEATURES = 4;
     RANDOM_POSITIONS = 4;
+    K_OUT_OF_N = MAX_POSITIVES;
 
     // fprintf(stderr, "[single-word phrase] phrase quality estimation...\n");
     solver->train(trainX, trainY, 1000, 1, 100, featureNames);

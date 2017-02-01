@@ -10,6 +10,7 @@ namespace RandomForestRelated
 
 vector<double> featureImportance;
 
+int K_OUT_OF_N = 1000;
 int RANDOM_FEATURES = 4;
 int RANDOM_POSITIONS = 8;
 
@@ -140,7 +141,7 @@ public:
         }
         vector<int> rootBag;
         for (int type = 0; type < 2; ++ type) {
-            int selected = (int)(min(index[0].size(), index[1].size())) * 16;
+            int selected = min(K_OUT_OF_N, (int)(min(index[0].size(), index[1].size())));
             for (int i = 0; i < selected; ++ i) {
                 int id = index[type][rng[threadID].next(index[type].size())];
                 rootBag.push_back(id);

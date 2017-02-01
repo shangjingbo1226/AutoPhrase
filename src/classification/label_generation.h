@@ -451,6 +451,33 @@ inline vector<Pattern> generateUnigram(vector<vector<double>> &features, string 
     return ret;
 }
 
+inline vector<Pattern> generateAll(string ALL_FILE, string QUALITY_FILE)
+{
+    unordered_set<ULL> exclude = loadPatterns(ALL_FILE);
+    unordered_set<ULL> include = loadPatterns(QUALITY_FILE);
+
+    vector<Pattern> ret;
+    int cntPositives = 0, cntNegatives = 0;
+    for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
+        if (patterns[i].size() < 1) {
+            continue;
+        }
+        if (include.count(patterns[i].hashValue)) {
+            ret.push_back(patterns[i]);
+            ret.back().label = 1;
+            ++ cntPositives;
+        } else if (!exclude.count(patterns[i].hashValue)) {
+            ret.push_back(patterns[i]);
+            ret.back().label = 0;
+            ++ cntNegatives;
+        }
+    }
+    fprintf(stderr, "\tThe size of the positive pool = %d\n", cntPositives);
+    fprintf(stderr, "\tThe size of the negative pool = %d\n", cntNegatives);
+
+    return ret;
+}
+
 void removeWrongLabels()
 {
     for (Pattern& pattern : patterns) {

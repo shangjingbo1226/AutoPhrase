@@ -50,23 +50,9 @@ int main(int argc, char* argv[])
         truth = Label::loadLabels(LABEL_FILE);
         int recognized = Features::recognize(truth);
     } else {
-        // generate labels
-        cerr << "Generating Labels..." << endl;
-        // multi-words
-        truth = Label::generate(features, featureNames, ALL_FILE, QUALITY_FILE);
+        cerr << "Constructing label pools..." << endl;
+        truth = Label::generateAll(ALL_FILE, QUALITY_FILE);
         int recognized = Features::recognize(truth);
-
-        // unigram
-        vector<Pattern> truthUnigram = Label::generateUnigram(featuresUnigram, ALL_FILE, QUALITY_FILE);
-        int recognizedUnigram = Features::recognize(truthUnigram);
-
-        if (INTERMEDIATE) {
-            Dump::dumpLabels("tmp/generated_label.txt", truth);
-            Dump::dumpLabels("tmp/generated_unigram_label.txt", truthUnigram);
-
-            Dump::dumpFeatures("tmp/features_for_labels.tsv", features, truth);
-            Dump::dumpFeatures("tmp/features_for_unigram_labels.tsv", featuresUnigram, truthUnigram);
-        }
     }
 
     if (ENABLE_POS_TAGGING) {
