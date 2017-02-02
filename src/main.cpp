@@ -68,6 +68,10 @@ int main(int argc, char* argv[])
         predictQuality(patterns, features, featureNames);
         predictQualityUnigram(patterns, featuresUnigram, featureNamesUnigram);
 
+        if (iteration == 0) {
+            Dump::dumpResults("tmp/distant_training_only");
+        }
+
         constructTrie(); // update the current frequent enough patterns
 
         // check the quality

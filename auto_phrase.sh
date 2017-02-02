@@ -96,4 +96,6 @@ java $TOKENIZER -m translate -i tmp/final_quality_multi-words.txt -o results/Aut
 java $TOKENIZER -m translate -i tmp/final_quality_unigrams.txt -o results/AutoPhrase_single-word.txt -t $TOKEN_MAPPING -c N -thread $THREAD
 java $TOKENIZER -m translate -i tmp/final_quality_salient.txt -o results/AutoPhrase.txt -t $TOKEN_MAPPING -c N -thread $THREAD
 
+java $TOKENIZER -m translate -i tmp/distant_training_only_salient.txt -o results/DistantTraning.txt -t $TOKEN_MAPPING -c N -thread $THREAD
+
 ### END Generating Output for Checking Quality ###
