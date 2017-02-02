@@ -70,6 +70,7 @@ int main(int argc, char* argv[])
 
         if (iteration == 0) {
             Dump::dumpResults("tmp/distant_training_only");
+break;
         }
 
         constructTrie(); // update the current frequent enough patterns

@@ -458,20 +458,30 @@ inline vector<Pattern> generateAll(string ALL_FILE, string QUALITY_FILE)
 
     vector<Pattern> ret;
     int cntPositives = 0, cntNegatives = 0;
+    vector<int> positives;
     for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
         if (patterns[i].size() < 1) {
             continue;
         }
         if (include.count(patterns[i].hashValue)) {
-            ret.push_back(patterns[i]);
-            ret.back().label = 1;
-            ++ cntPositives;
+            positives.push_back(i);
         } else if (!exclude.count(patterns[i].hashValue)) {
             ret.push_back(patterns[i]);
             ret.back().label = 0;
             ++ cntNegatives;
         }
     }
+
+    if (MAX_POSITIVE != -1 && MAX_POSITIVE < positives.size()) {
+        random_shuffle(positives.begin(), positives.end());
+        positives.resize(MAX_POSITIVE);
+    }
+    for (PATTERN_ID_TYPE i : positives) {
+        ret.push_back(patterns[i]);
+        ret.back().label = 1;
+        ++ cntPositives;
+    }
+
     fprintf(stderr, "\tThe size of the positive pool = %d\n", cntPositives);
     fprintf(stderr, "\tThe size of the negative pool = %d\n", cntNegatives);
 
