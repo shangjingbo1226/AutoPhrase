@@ -33,7 +33,7 @@ string NO_EXPANSION_POS_FILENAME = "";
 double DISCARD = 0.05;
 string LABEL_FILE = "";
 bool INTERMEDIATE = false;
-string LABEL_METHOD = "ByLengthByPositive";
+string LABEL_METHOD = "DPDN"; // EPEN, EPDN, DPDN
 
 string SEGMENTATION_MODEL = "";
 int SEGMENT_QUALITY_TOP_K = 50000;

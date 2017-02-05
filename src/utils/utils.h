@@ -53,7 +53,7 @@ inline bool myAssert(bool flg, string msg)
 {
 	if (!flg) {
 		cerr << msg << endl;
-		exit(-1);
+		// exit(-1);
 	}
 	return flg;
 }

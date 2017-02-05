@@ -44,16 +44,9 @@ int main(int argc, char* argv[])
     vector<string> featureNamesUnigram;
     vector<vector<double>> featuresUnigram = Features::extractUnigram(featureNamesUnigram);
 
-    vector<Pattern> truth;
-    if (LABEL_FILE != "") {
-        cerr << "Loading existing labels..." << endl;
-        truth = Label::loadLabels(LABEL_FILE);
-        int recognized = Features::recognize(truth);
-    } else {
-        cerr << "Constructing label pools..." << endl;
-        truth = Label::generateAll(ALL_FILE, QUALITY_FILE);
-        int recognized = Features::recognize(truth);
-    }
+    cerr << "Constructing label pools..." << endl;
+    vector<Pattern> truth = Label::generateAll(LABEL_METHOD, LABEL_FILE, ALL_FILE, QUALITY_FILE);
+    int recognized = Features::recognize(truth);
 
     if (ENABLE_POS_TAGGING) {
         Segmentation::initializePosTags(Documents::posTag2id.size());
@@ -70,6 +63,7 @@ int main(int argc, char* argv[])
 
         if (iteration == 0) {
             Dump::dumpResults("tmp/distant_training_only");
+break;
         }
 
         constructTrie(); // update the current frequent enough patterns

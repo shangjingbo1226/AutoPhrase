@@ -11,15 +11,21 @@ void predictQuality(vector<Pattern> &patterns, vector<vector<double>> &features,
 {
     vector<vector<double>> trainX;
     vector<double> trainY;
-    for (int i = 0; i < patterns.size(); ++ i) {
+    int cnt_positves = 0, cnt_negatives = 0;
+    for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
         if (patterns[i].size() > 1 && patterns[i].label != FrequentPatternMining::UNKNOWN_LABEL) {
             trainX.push_back(features[i]);
             trainY.push_back(patterns[i].label);
+            if (patterns[i].label) {
+                ++ cnt_positves;
+            } else {
+                ++ cnt_negatives;
+            }
         }
     }
-
-    if (trainX.size() == 0) {
-        fprintf(stderr, "[ERROR] no training data found!\n");
+    if (trainX.size() == 0 || cnt_positves == 0 || cnt_negatives == 0) {
+        cerr << cnt_positves << " " << cnt_negatives << endl;
+        fprintf(stderr, "[ERROR] not enough training data found!\n");
         return;
     }
 
@@ -46,7 +52,7 @@ void predictQuality(vector<Pattern> &patterns, vector<vector<double>> &features,
         }
     }
 
-	for (int i = 0; i < features.size(); ++ i) {
+	for (PATTERN_ID_TYPE i = 0; i < features.size(); ++ i) {
         if (patterns[i].size() > 1) {
             patterns[i].quality = solver->estimate(features[i]);
         }
@@ -57,7 +63,7 @@ void predictQualityUnigram(vector<Pattern> &patterns, vector<vector<double>> &fe
 {
     vector<vector<double>> trainX;
     vector<double> trainY;
-    for (int i = 0; i < patterns.size(); ++ i) {
+    for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
         if (patterns[i].size() == 1 && patterns[i].label != FrequentPatternMining::UNKNOWN_LABEL) {
             trainX.push_back(features[i]);
             trainY.push_back(patterns[i].label);

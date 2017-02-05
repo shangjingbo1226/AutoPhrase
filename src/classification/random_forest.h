@@ -162,11 +162,16 @@ public:
             TreeNode &node = nodes[curNode];
             vector<int> &bag = nodeBags[curNode];
 
+            if (bag.size() == 0) {
+                // a null tree
+                node.leaf = true;
+                node.result = 0;
+                continue;
+            }
+
             myAssert(bag.size() > 0, "[ERROR] empty node in decision tree!");
-            myAssert(bag.size() >= minNodeSize, "[ERROR] bag is too small!");
 
             bool equal = true;
-
             double first = results[bag[0]];
             for (int i = 1; i < (int)bag.size(); ++ i) {
                 if (sign(results[bag[i]] - first)) {
@@ -184,6 +189,8 @@ public:
                 node.result /= bag.size();
                 continue;
             }
+
+            myAssert(bag.size() >= minNodeSize, "[ERROR] bag is too small!");
 
             double bagLoss = calculateLoss(bag, results);
 
