@@ -1,12 +1,14 @@
 #!/bin/bash
 RAW_TRAIN=${RAW_TRAIN:- data/DBLP.txt}
-FIRST_RUN=${FIRST_RUN:- 1}
+FIRST_RUN=${FIRST_RUN:- 0}
 ENABLE_POS_TAGGING=${ENABLE_POS_TAGGING:- 1}
 MIN_SUP=${MIN_SUP:- 30}
 THREAD=${THREAD:- 10}
 
 ### Begin: Suggested Parameters ###
-MAX_POSITIVES=100
+MAX_POSITIVES=-1
+LABEL_METHOD=DPDN
+RAW_LABEL_FILE=""
 ### End: Suggested Parameters ###
 
 green=`tput setaf 2`
@@ -49,6 +51,7 @@ TOKENIZED_QUALITY=tmp/tokenized_quality.txt
 STOPWORDS=data/$LANGUAGE/stopwords.txt
 ALL_WIKI_ENTITIES=data/$LANGUAGE/wiki_all.txt
 QUALITY_WIKI_ENTITIES=data/$LANGUAGE/wiki_quality.txt
+LABEL_FILE=tmp/labels.txt
 if [ $FIRST_RUN -eq 1 ]; then
     echo -ne "Current step: Tokenizing stopword file...\033[0K\r"
     java $TOKENIZER -m test -i $STOPWORDS -o $TOKENIZED_STOPWORDS -t $TOKEN_MAPPING -c N -thread $THREAD
@@ -57,6 +60,13 @@ if [ $FIRST_RUN -eq 1 ]; then
     java $TOKENIZER -m test -i $QUALITY_WIKI_ENTITIES -o $TOKENIZED_QUALITY -t $TOKEN_MAPPING -c N -thread $THREAD
 fi  
 ### END Tokenization ###
+
+if [[ $RAW_LABEL_FILE = *[!\ ]* ]]; then
+	echo -ne "Current step: Tokenizing expert labels...\033[0K\n"
+	java $TOKENIZER -m test -i $RAW_LABEL_FILE -o $LABEL_FILE -t $TOKEN_MAPPING -c N -thread $THREAD
+else
+	echo -ne "No provided expert labels.\033[0K\n"
+fi
 
 echo ${green}===Part-Of-Speech Tagging===${reset}
 
@@ -77,15 +87,15 @@ if [ $ENABLE_POS_TAGGING -eq 1 ]; then
         --thread $THREAD \
         --pos_prune data/BAD_POS_TAGS.txt \
         --label_method $LABEL_METHOD \
+		--label $LABEL_FILE \
         --max_positives $MAX_POSITIVES \
-        --negative_ratio $NEGATIVE_RATIO \
         --min_sup $MIN_SUP
 else
     time ./bin/segphrase_train \
         --thread $THREAD \
         --label_method $LABEL_METHOD \
+		--label $LABEL_FILE \
         --max_positives $MAX_POSITIVES \
-        --negative_ratio $NEGATIVE_RATIO \
         --min_sup $MIN_SUP
 fi
 
@@ -96,6 +106,6 @@ java $TOKENIZER -m translate -i tmp/final_quality_multi-words.txt -o results/Aut
 java $TOKENIZER -m translate -i tmp/final_quality_unigrams.txt -o results/AutoPhrase_single-word.txt -t $TOKEN_MAPPING -c N -thread $THREAD
 java $TOKENIZER -m translate -i tmp/final_quality_salient.txt -o results/AutoPhrase.txt -t $TOKEN_MAPPING -c N -thread $THREAD
 
-java $TOKENIZER -m translate -i tmp/distant_training_only_salient.txt -o results/DistantTraning.txt -t $TOKEN_MAPPING -c N -thread $THREAD
+# java $TOKENIZER -m translate -i tmp/distant_training_only_salient.txt -o results/DistantTraning.txt -t $TOKEN_MAPPING -c N -thread $THREAD
 
 ### END Generating Output for Checking Quality ###
