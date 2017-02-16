@@ -1,4 +1,4 @@
-# AutoPhrase: A Unified Framework for Automated Quality Phrase Mining from Massive Text Corpora
+# AutoPhrase: Automated Phrase Mining from Massive Text Corpora
 
 ## Publications
 
