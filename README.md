@@ -4,9 +4,7 @@
 
 Please cite the following two papers if you are using our tools. Thanks!
 
-*   Jingbo Shang, Jialu Liu, Meng Jiang, Xiang Ren, Jiawei Han, "**AutoPhrase: A
-    Framework for Automated Quality Phrase Mining from Massive Text
-    Corpora**", submitted to SIGKDD 2017, under review. [arXiv:1702.04457](https://128.84.21.199/abs/1702.04457) [cs.CL]
+*   Jingbo Shang, Jialu Liu, Meng Jiang, Xiang Ren, Clare R Voss, Jiawei Han, "**Automated Phrase Mining from Massive Text Corpora**", submitted to SIGKDD 2017, under review. [arXiv:1702.04457](https://128.84.21.199/abs/1702.04457) [cs.CL]
 
 *   Jialu Liu\*, Jingbo Shang\*, Chi Wang, Xiang Ren and Jiawei Han, "**[Mining
     Quality Phrases from Massive Text
