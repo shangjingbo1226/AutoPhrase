@@ -36,8 +36,12 @@ import org.apache.lucene.analysis.ja.dict.UserDictionary;
 import org.apache.lucene.analysis.ja.tokenattributes.PartOfSpeechAttribute;
 import org.apache.lucene.analysis.pt.PortugueseAnalyzer;
 import org.apache.lucene.analysis.ru.RussianAnalyzer;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.util.CharArraySet;
+import org.apache.lucene.util.AttributeFactory;
+
 import com.cybozu.labs.langdetect.Detector;
 import com.cybozu.labs.langdetect.DetectorFactory;
 import com.cybozu.labs.langdetect.LangDetectException;
@@ -53,6 +57,27 @@ class SpecialTagger {
 		String[] ret = new String[1];
 		ret[0] = text;
 		return ret;
+	}
+}
+
+class StandardTagger extends SpecialTagger {
+	@Override
+	public String[] tag(String text) {
+		StandardTokenizer tokenizer = new StandardTokenizer();
+		tokenizer.setReader(new StringReader(text));
+		CharTermAttribute attr = tokenizer.addAttribute(CharTermAttribute.class);
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			tokenizer.reset();
+			while(tokenizer.incrementToken()) {
+			    String term = attr.toString();
+			    result.add(term + "/UNKNOWN"); // the first term is the token and the second term is its POS tag
+			}
+			tokenizer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result.toArray(new String[result.size()]);
 	}
 }
 
@@ -145,7 +170,8 @@ public class Tokenizer {
                 {punctuationMappingFileName = "/indo_european_punctuation_mapping.txt"; break;}
             case "CN": case "JA":
                 {punctuationMappingFileName = "/cjk_punctuation_mapping.txt"; break;}
-            default: {System.err.println("[ERROR] unknown language: " + language + "!!!");}
+            default:
+            	{System.err.println("Using default setting for unknown languages..."); punctuationMappingFileName = "/indo_european_punctuation_mapping.txt";}
         }
         punctuation_mapping = new HashMap<String, String>();
         try {
@@ -216,9 +242,16 @@ public class Tokenizer {
     private static SpecialTagger getSuitableTagger(String language, String mode) throws IOException {
         switch (language) {
             case "CN": {return new ChineseTagger();}
-            default: {System.err.println("[ERROR] unknown language: " + language + "!!!");}
         }
-        return new SpecialTagger();
+        System.err.println("Using default setting for unknown languages...");
+        return new StandardTagger();
+    }
+
+    private static boolean hasSuitableAnalyzer(String language) throws IOException {
+        switch (language) {
+            case "EN": case "FR": case "DE": case "ES": case "IT": case "PT": case "RU": case "CN": case "JA": case "AR": {return true;}
+            default: {return false;}
+        }
     }
 
     private static Analyzer getSuitableAnalyzer(String language, String mode) throws IOException {
@@ -341,7 +374,7 @@ public class Tokenizer {
     private static SpecialTagger getTagger(String threadName, String language, String mode) {
     	if (!taggers.containsKey(threadName)) {
     		try {
-    			System.err.println("[DEBUG] " + threadName);
+    			// System.err.println("[DEBUG] " + threadName);
     			taggers.put(threadName, getSuitableTagger(language, mode));
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -368,7 +401,7 @@ public class Tokenizer {
                 public Output call() throws Exception {
                 	Output output = new Output();
                 	ArrayList<ArrayList<String>> token_pairs;
-                	if (language.equals("CN")) {
+                	if (!hasSuitableAnalyzer(language)) {
                 		SpecialTagger tagger = getTagger(Thread.currentThread().getName(), language, mode);
                 		token_pairs = lineToTokens(tagger, line, mode);
                 	} else {
@@ -526,9 +559,9 @@ public class Tokenizer {
             }
         }
     }
-    
-    static LinkedList<String> tokenBuffer = new LinkedList<String>(); 
-    
+
+    static LinkedList<String> tokenBuffer = new LinkedList<String>();
+
     private static String nextToken(BufferedReader tokenizedReader) throws IOException {
     	while (tokenBuffer.size() == 0) {
     		String[] tokens = tokenizedReader.readLine().split(" ");
@@ -538,7 +571,7 @@ public class Tokenizer {
     	}
     	return tokenBuffer.removeFirst();
     }
-    
+
     private static String nextValidToken(BufferedReader tokenizedReader) throws IOException {
     	while (true) {
     		String token = nextToken(tokenizedReader);
@@ -554,7 +587,7 @@ public class Tokenizer {
             BufferedReader segmentedReader = new BufferedReader(new InputStreamReader(new FileInputStream(segmentedFileName), "UTF8"));
             BufferedReader tokenizedReader = new BufferedReader(new InputStreamReader(new FileInputStream(tokenizedFileName), "UTF8"));
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFileName), "UTF8"));
-            
+
             String buffer = "";
             boolean isPhrase = false;
             while (segmentedReader.ready()) {
@@ -580,19 +613,19 @@ public class Tokenizer {
     	                    		ptr = 0;
     	                    	}
     	                    	if (buffer.length() < token.length()) {
-    	                    		buffer += reader.readLine() + '\n';	
+    	                    		buffer += reader.readLine() + '\n';
     	                    	} else {
     	                    		break;
     	                    	}
                         	}
-                        	
+
                     		if (!punctuation_mapping.containsKey(token) && isPhrase) {
                     			isPhrase = false;
                     			writer.write("<phrase>");
                     		}
                     		writer.write(buffer.substring(0, token.length()));
                         	buffer = buffer.substring(token.length(), buffer.length());
-                    
+
                         	if (!punctuation_mapping.containsKey(token)) {
                     			break;
                     		}
@@ -600,7 +633,7 @@ public class Tokenizer {
                     }
                 }
             }
-            
+
             reader.close();
             tokenizedReader.close();
             segmentedReader.close();
@@ -613,7 +646,6 @@ public class Tokenizer {
     }
 
     private static void tokenizeText(String rawFileName, String targetFileName, String language, String mode, String case_sen) throws IOException {
-        Analyzer analyzer = getSuitableAnalyzer(language, mode);
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(rawFileName), "UTF8"));
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFileName), "UTF8"));
@@ -631,7 +663,7 @@ public class Tokenizer {
                 if (case_sen.equals("N")) {
                     case_writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newTargetFileFolder + "case_" + parts[parts.length - 1]), "UTF8"));
                 }
-                if (language.equals("JA") || language.equals("CN")) {
+                if (language.equals("JA") || language.equals("CN") || !hasSuitableAnalyzer(language)) {
                     tag_writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newTargetFileFolder + "pos_tags_" + parts[parts.length - 1]), "UTF8"));
                 } else {
                     raw_writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newTargetFileFolder + "raw_" + parts[parts.length - 1]), "UTF8"));
@@ -683,7 +715,6 @@ public class Tokenizer {
 
             reader.close();
             writer.close();
-            analyzer.close();
             if (mode.equals("train") || mode.equals("test")) {
                 if (case_writer != null) {
                 	case_writer.close();
@@ -751,7 +782,7 @@ public class Tokenizer {
             System.err.println("java -jar tokenizer.jar -m translate -l EN -c Y -i en_tokenized.txt -o raw_en_tokenized.txt   -t token_mapping.txt");
             return;
         }
-        
+
     	counter = new AtomicInteger(-1);
     	// System.err.println("# of threads = " + threads);
     	service = Executors.newFixedThreadPool(threads);
