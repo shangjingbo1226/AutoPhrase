@@ -70,7 +70,7 @@ fi
 
 echo ${green}===Part-Of-Speech Tagging===${reset}
 
-if [ ! $LANGUAGE == "JA" ] && [ ! $LANGUAGE == "CN" ]  && [ $ENABLE_POS_TAGGING -eq 1 ] && [ $FIRST_RUN -eq 1 ]; then
+if [ ! $LANGUAGE == "JA" ] && [ ! $LANGUAGE == "CN" ]  && [ ! $LANGUAGE == "OTHER" ]  && [ $ENABLE_POS_TAGGING -eq 1 ] && [ $FIRST_RUN -eq 1 ]; then
     RAW=tmp/raw_tokenized_train.txt
     export THREAD LANGUAGE RAW
     bash ./tools/treetagger/pos_tag.sh
