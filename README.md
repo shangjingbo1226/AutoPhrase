@@ -44,16 +44,34 @@ MacOS:
 ## Default Run
 
 ```
-$ ./auto_phrase
+$ ./auto_phrase.sh
 ```
 
 The default run will download an English corpus from the server of our data
 mining group and run AutoPhrase to get 3 ranked lists of phrases under the
-results/ folder * results/AutoPhrase.txt: the unified ranked list for both
-single-word phrases and multi-word phrases. *
-results/AutoPhrase_multi-words.txt: the sub-ranked list for multi-word phrases
-only. * results/AutoPhrase_single-word.txt: the sub-ranked list for single-word
-phrases only.
+results/ folder 
+* results/AutoPhrase.txt: the unified ranked list for both single-word phrases and multi-word phrases. 
+* results/AutoPhrase_multi-words.txt: the sub-ranked list for multi-word phrases only. 
+* results/AutoPhrase_single-word.txt: the sub-ranked list for single-word phrases only.
+
+## Incorporate Domain-Specific Knowledge Bases
+
+If domain-specific knowledge bases are available, such as MeSH terms, there are two ways to incorporate them.
+* (**recommended**) Append your known quality phrases to the file "data/EN/wiki_quality.txt".
+* Replace the file "data/EN/wiki_quality.txt" by your known quality phrases.
+
+## Handle Other Languages
+
+We provide a default tokenizer together with a dummy POS tagger in the tools/tokenizer.
+It uses the StandardTokenizer in Lucene, and always assign a tag UNKNOWN to each token.
+To enable this feature, please add the "-l OTHER" to the TOKENIZER command in the bash script auto_phrase.sh.
+```
+TOKENIZER="-cp .:tools/tokenizer/lib/*:tools/tokenizer/resources/:tools/tokenizer/build/ Tokenizer -l OTHER"
+```
+If you want to incorporate your own tokenizer and/or POS tagger, please create a new class extending SpecialTagger in the tools/tokenizer. You may refer to StandardTagger as an example.
+
+Meanwhile, you have to add two lists of quality phrases in the data/OTHER/wiki_quality.txt and data/OTHER/wiki_all.txt. 
+The quality of phrases in wiki_quality should be very confident, while wiki_all, as its superset, could be a little noisy.
 
 ## Parameters
 
