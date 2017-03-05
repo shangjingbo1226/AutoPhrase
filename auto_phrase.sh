@@ -1,8 +1,15 @@
 #!/bin/bash
+# RAW_TRAIN is the input of AutoPhrase, where each line is a single document.
 RAW_TRAIN=${RAW_TRAIN:- data/DBLP.txt}
+# When FIRST_RUN is set to 1, AutoPhrase will run all preprocessing. 
+# Otherwise, AutoPhrase directly starts from the current preprocessed data in the tmp/ folder.
 FIRST_RUN=${FIRST_RUN:- 1}
+# When ENABLE_POS_TAGGING is set to 1, AutoPhrase will utilize the POS tagging in the phrase mining. 
+# Otherwise, a simple length penalty mode as the same as SegPhrase will be used.
 ENABLE_POS_TAGGING=${ENABLE_POS_TAGGING:- 1}
+# A hard threshold of raw frequency is specified for frequent phrase mining, which will generate a candidate set.
 MIN_SUP=${MIN_SUP:- 30}
+# You can also specify how many threads can be used for AutoPhrase
 THREAD=${THREAD:- 10}
 
 ### Begin: Suggested Parameters ###
