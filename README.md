@@ -73,43 +73,6 @@ If you want to incorporate your own tokenizer and/or POS tagger, please create a
 Meanwhile, you have to add two lists of quality phrases in the data/OTHER/wiki_quality.txt and data/OTHER/wiki_all.txt. 
 The quality of phrases in wiki_quality should be very confident, while wiki_all, as its superset, could be a little noisy.
 
-## Parameters
-
-```
-RAW_TRAIN=data/DBLP.txt
-```
-
-RAW_TRAIN is the input of AutoPhrase, where each line is a single document.
-
-```
-FIRST_RUN=1
-```
-
-When FIRST_RUN is set to 1, AutoPhrase will run all preprocessing. Otherwise,
-AutoPhrase directly starts from the current preprocessed data in the tmp/
-folder.
-
-```
-ENABLE_POS_TAGGING=1
-```
-
-When ENABLE_POS_TAGGING is set to 1, AutoPhrase will utilize the POS tagging in
-the phrase mining. Otherwise, a simple length penalty mode as the same as
-SegPhrase will be used.
-
-```
-MIN_SUP=30
-```
-
-A hard threshold of raw frequency is specified for frequent phrase mining, which
-will generate a candidate set.
-
-```
-THREAD=10
-```
-
-You can also specify how many threads can be used for AutoPhrase
-
 ## Docker
 
 ###Default Run
