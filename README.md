@@ -62,6 +62,7 @@ If domain-specific knowledge bases are available, such as MeSH terms, there are 
 
 ## Handle Other Languages
 
+* Tokenizer and POS tagger
 We provide a default tokenizer together with a dummy POS tagger in the tools/tokenizer.
 It uses the StandardTokenizer in Lucene, and always assign a tag UNKNOWN to each token.
 To enable this feature, please add the "-l OTHER" to the TOKENIZER command in the bash script auto_phrase.sh.
@@ -70,8 +71,10 @@ TOKENIZER="-cp .:tools/tokenizer/lib/*:tools/tokenizer/resources/:tools/tokenize
 ```
 If you want to incorporate your own tokenizer and/or POS tagger, please create a new class extending SpecialTagger in the tools/tokenizer. You may refer to StandardTagger as an example.
 
+* wiki_all.txt and wiki_quality.txt
+
 Meanwhile, you have to add two lists of quality phrases in the data/OTHER/wiki_quality.txt and data/OTHER/wiki_all.txt. 
-The quality of phrases in wiki_quality should be very confident, while wiki_all, as its superset, could be a little noisy.
+The quality of phrases in wiki_quality should be very confident, while wiki_all, as its superset, could be a little noisy. For more details, please refer to the [tools/wiki_enities](https://github.com/shangjingbo1226/AutoPhrase/tree/master/tools/wiki_entities).
 
 ## Docker
 
