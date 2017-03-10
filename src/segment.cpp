@@ -15,8 +15,11 @@ using FrequentPatternMining::patterns;
 vector<double> f;
 vector<int> pre;
 
+int highlights = 0, sentences = 0;
+
 void process(const vector<TOTAL_TOKENS_TYPE>& tokens, const vector<POS_ID_TYPE>& tags, Segmentation& segmenter, FILE* out)
 {
+    ++ sentences;
     if (ENABLE_POS_TAGGING) {
         segmenter.viterbi(tokens, tags, f, pre);
     } else {
@@ -37,9 +40,13 @@ void process(const vector<TOTAL_TOKENS_TYPE>& tokens, const vector<POS_ID_TYPE>&
             }
             u = trie[u].children[tokens[k]];
         }
-        quality &= trie[u].id >= 0 && trie[u].id < SEGMENT_QUALITY_TOP_K;
+        quality &= trie[u].id >= 0 && (
+                    patterns[trie[u].id].size() > 1 && patterns[trie[u].id].quality >= SEGMENT_MULTI_WORD_QUALITY_THRESHOLD ||
+                    patterns[trie[u].id].size() == 1 && patterns[trie[u].id].quality >= SEGMENT_SINGLE_WORD_QUALITY_THRESHOLD
+                   );
         if (quality) {
             ret.push_back("</phrase>");
+            ++ highlights;
         }
         for (int k = i - 1; k >= j; -- k) {
             ostringstream sout;
@@ -146,6 +153,10 @@ int main(int argc, char* argv[])
         fclose(posIn);
     }
     fclose(out);
+
+    cerr << "# of total highlighted quality phrases = " << highlights << endl;
+    cerr << "# of total processed sentences = " << sentences << endl;
+    cerr << "avg phrase per sentence = " << (double)highlights / sentences << endl;
 
     return 0;
 }

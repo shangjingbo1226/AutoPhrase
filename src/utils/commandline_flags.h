@@ -39,8 +39,10 @@ void parseCommandFlags(int argc, char* argv[])
             fromString(argv[++ i], NEGATIVE_RATIO);
         } else if (!strcmp(argv[i], "--model")) {
             SEGMENTATION_MODEL = argv[++ i];
-        } else if (!strcmp(argv[i], "--highlight")) {
-            fromString(argv[++ i], SEGMENT_QUALITY_TOP_K);
+        } else if (!strcmp(argv[i], "--highlight-multi")) {
+            fromString(argv[++ i], SEGMENT_MULTI_WORD_QUALITY_THRESHOLD);
+        } else if (!strcmp(argv[i], "--highlight-single")) {
+            fromString(argv[++ i], SEGMENT_SINGLE_WORD_QUALITY_THRESHOLD);
         } else {
             fprintf(stderr, "[Warning] Unknown Parameter: %s\n", argv[i]);
         }
@@ -70,7 +72,8 @@ void parseCommandFlags(int argc, char* argv[])
         } else {
             fprintf(stderr, "=== Current Settings ===\n");
             fprintf(stderr, "SEGMENTATION_MODEL = %s\n", SEGMENTATION_MODEL.c_str());
-            fprintf(stderr, "SEGMENT_QUALITY_TOP_K = %d\n", SEGMENT_QUALITY_TOP_K);
+            fprintf(stderr, "SEGMENT_MULTI_WORD_QUALITY_THRESHOLD = %.6f\n", SEGMENT_MULTI_WORD_QUALITY_THRESHOLD);
+            fprintf(stderr, "SEGMENT_SINGLE_WORD_QUALITY_THRESHOLD = %.6f\n", SEGMENT_SINGLE_WORD_QUALITY_THRESHOLD);
         }
 
         fprintf(stderr, "=======\n");
