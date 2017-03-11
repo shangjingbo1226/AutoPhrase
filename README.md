@@ -43,6 +43,7 @@ MacOS:
 
 ## Default Run
 
+#### Phrase Mining Step
 ```
 $ ./auto_phrase.sh
 ```
@@ -54,6 +55,14 @@ results/ folder
 * results/AutoPhrase_multi-words.txt: the sub-ranked list for multi-word phrases only. 
 * results/AutoPhrase_single-word.txt: the sub-ranked list for single-word phrases only.
 
+
+#### Phrasal Segmentation
+We also provide an auxiliary function to highlight the phrases in context based on our phrasal segmentation model. There are two thresholds you can tune in the top of the script. The model can also handle unknown tokens (i.e., tokens which are not occurred in the phrase mining step's corpus).
+```
+$ ./phrasal_segmentation.sh
+```
+The segmentation results will be put under the results/ folder as well ("results/segmentation.txt"). The highlighted phrases will be enclosed by the phrase tags.
+
 ## Incorporate Domain-Specific Knowledge Bases
 
 If domain-specific knowledge bases are available, such as MeSH terms, there are two ways to incorporate them.
@@ -63,12 +72,18 @@ If domain-specific knowledge bases are available, such as MeSH terms, there are 
 ## Handle Other Languages
 
 #### Tokenizer and POS tagger
-We provide a default tokenizer together with a dummy POS tagger in the tools/tokenizer.
+In fact, our tokenizer supports many different languages, including Arabics (AR), German (DE), English (EN), Spanish (ES), French (FR), Italian (IT), Japanese (JA), Portuguese (PT), Russian (RU), and Chinese (CN). If the language detection is wrong, you can also manually specify the language by modify the TOKENIZER command in the bash script auto_phrase.sh using the two-letter code for that language. For example, the following one forces the language to be English.
+```
+TOKENIZER="-cp .:tools/tokenizer/lib/*:tools/tokenizer/resources/:tools/tokenizer/build/ Tokenizer -l EN"
+```
+
+We also provide a default tokenizer together with a dummy POS tagger in the tools/tokenizer.
 It uses the StandardTokenizer in Lucene, and always assign a tag UNKNOWN to each token.
 To enable this feature, please add the "-l OTHER" to the TOKENIZER command in the bash script auto_phrase.sh.
 ```
 TOKENIZER="-cp .:tools/tokenizer/lib/*:tools/tokenizer/resources/:tools/tokenizer/build/ Tokenizer -l OTHER"
 ```
+
 If you want to incorporate your own tokenizer and/or POS tagger, please create a new class extending SpecialTagger in the tools/tokenizer. You may refer to StandardTagger as an example.
 
 #### stopwords.txt
