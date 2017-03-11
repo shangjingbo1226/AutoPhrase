@@ -154,9 +154,10 @@ int main(int argc, char* argv[])
     }
     fclose(out);
 
-    cerr << "# of total highlighted quality phrases = " << highlights << endl;
-    cerr << "# of total processed sentences = " << sentences << endl;
-    cerr << "avg phrase per sentence = " << (double)highlights / sentences << endl;
+    cerr << "Phrasal segmentation finished." << endl;
+    cerr << "   # of total highlighted quality phrases = " << highlights << endl;
+    cerr << "   # of total processed sentences = " << sentences << endl;
+    cerr << "   avg highlights per sentence = " << (double)highlights / sentences << endl;
 
     return 0;
 }

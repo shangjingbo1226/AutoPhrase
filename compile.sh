@@ -9,7 +9,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         cp tools/treetagger/bin/tree-tagger-linux tools/treetagger/bin/tree-tagger
     fi
 fi
-if [ ! -e tools/tokenizer/build/Tokenizer.class ]; then
-    mkdir -p tools/tokenizer/build/
-    javac -cp ".:tools/tokenizer/lib/*" tools/tokenizer/src/Tokenizer.java -d tools/tokenizer/build/
-fi
+#if [ ! -e tools/tokenizer/build/Tokenizer.class ]; then
+mkdir -p tools/tokenizer/build/
+javac -cp ".:tools/tokenizer/lib/*" tools/tokenizer/src/Tokenizer.java -d tools/tokenizer/build/
+#fi

@@ -26,37 +26,43 @@ void loadSegmentationModel(const string& filename)
     myAssert(ENABLE_POS_TAGGING == flag, "Model and configuration mismatch! whether ENABLE_POS_TAGGING?");
     Binary::read(in, Segmentation::penalty);
 
-    cerr << flag << " " << Segmentation::penalty << endl;
+    if (flag) {
+        cerr << "POS guided model loaded." << endl;
+    } else {
+        cerr << "Length penalty model loaded." << endl;
+        cerr << "\tpenalty = " << Segmentation::penalty << endl;
+    }
 
     // quality phrases & unigrams
     size_t cnt = 0;
     Binary::read(in, cnt);
     patterns.resize(cnt);
-    cerr << "# of patterns to load = " << cnt << endl;
     for (int i = 0; i < cnt; ++ i) {
         patterns[i].load(in);
     }
-    cerr << "pattern loaded" << endl;
+    cerr << "# of loaded patterns = " << cnt << endl;
 
-    // POS Tag mapping
-    Binary::read(in, cnt);
-    Documents::posTag.resize(cnt);
-    for (int i = 0; i < Documents::posTag.size(); ++ i) {
-        Binary::read(in, Documents::posTag[i]);
-        Documents::posTag2id[Documents::posTag[i]] = i;
-    }
-    cerr << "pos tags loaded" << endl;
-
-    // POS Tag Transition
-    Binary::read(in, cnt);
-    Segmentation::connect.resize(cnt);
-    for (int i = 0; i < Segmentation::connect.size(); ++ i) {
-        Segmentation::connect[i].resize(cnt);
-        for (int j = 0; j < Segmentation::connect[i].size(); ++ j) {
-            Binary::read(in, Segmentation::connect[i][j]);
+    if (flag) {
+        // POS Tag mapping
+        Binary::read(in, cnt);
+        Documents::posTag.resize(cnt);
+        for (int i = 0; i < Documents::posTag.size(); ++ i) {
+            Binary::read(in, Documents::posTag[i]);
+            Documents::posTag2id[Documents::posTag[i]] = i;
         }
+        // cerr << "pos tags loaded" << endl;
+
+        // POS Tag Transition
+        Binary::read(in, cnt);
+        Segmentation::connect.resize(cnt);
+        for (int i = 0; i < Segmentation::connect.size(); ++ i) {
+            Segmentation::connect[i].resize(cnt);
+            for (int j = 0; j < Segmentation::connect[i].size(); ++ j) {
+                Binary::read(in, Segmentation::connect[i][j]);
+            }
+        }
+        cerr << "POS transition matrix loaded" << endl;
     }
-    cerr << "POS tag transition loaded" << endl;
 
     fclose(in);
 }

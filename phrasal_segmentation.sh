@@ -10,20 +10,9 @@ reset=`tput sgr0`
 
 echo ${green}===Compilation===${reset}
 
-if [ "$(uname)" == "Darwin" ]; then
-	make all CXX=g++-6 | grep -v "Nothing to be done for"
-	cp tools/treetagger/bin/tree-tagger-mac tools/treetagger/bin/tree-tagger
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-        make all CXX=g++ | grep -v "Nothing to be done for"
-	if [[ $(uname -r) == 2.6* ]]; then
-		cp tools/treetagger/bin/tree-tagger-linux-old tools/treetagger/bin/tree-tagger
-	else
-		cp tools/treetagger/bin/tree-tagger-linux tools/treetagger/bin/tree-tagger
-	fi
-fi
-if [ ! -e tools/tokenizer/build/Tokenizer.class ]; then
-    mkdir -p tools/tokenizer/build/
-	javac -cp ".:tools/tokenizer/lib/*" tools/tokenizer/src/Tokenizer.java -d tools/tokenizer/build/
+COMPILE=${COMPILE:- 1}
+if [ $COMPILE -eq 1 ]; then
+    bash compile.sh
 fi
 
 mkdir -p tmp
@@ -38,17 +27,17 @@ TOKENIZED_TEXT_TO_SEG=tmp/tokenized_text_to_seg.txt
 CASE=tmp/case_tokenized_text_to_seg.txt
 TOKEN_MAPPING=tmp/token_mapping.txt
 
-LANGUAGE=`cat tmp/language.txt`
-echo -ne "Detected Language: $LANGUAGE\033[0K\n"
-
 echo -ne "Current step: Tokenizing input file...\033[0K\r"
 time java $TOKENIZER -m test -i $TEXT_TO_SEG -o $TOKENIZED_TEXT_TO_SEG -t $TOKEN_MAPPING -c N -thread $THREAD
+
+LANGUAGE=`cat tmp/language.txt`
+echo -ne "Detected Language: $LANGUAGE\033[0K\n"
 
 ### END Tokenization ###
 
 echo ${green}===Part-Of-Speech Tagging===${reset}
 
-if [ ! $LANGUAGE == "JA" ] && [ $ENABLE_POS_TAGGING -eq 1 ]; then
+if [ ! $LANGUAGE == "JA" ] && [ ! $LANGUAGE == "CN" ]  && [ ! $LANGUAGE == "OTHER" ]  && [ $ENABLE_POS_TAGGING -eq 1 ]; then
 	RAW=tmp/raw_tokenized_text_to_seg.txt # TOKENIZED_TEXT_TO_SEG is the suffix name after "raw_"
 	export THREAD LANGUAGE RAW
 	bash ./tools/treetagger/pos_tag.sh
@@ -79,6 +68,6 @@ fi
 ### END Segphrasing ###
 
 echo ${green}===Generating Output===${reset}
-java $TOKENIZER -m segmentation -i $TEXT_TO_SEG -segmented tmp/tokenized_segmented_sentences.txt -o results/segmentation.txt -tokenized tmp/raw_tokenized_text_to_seg.txt
+java $TOKENIZER -m segmentation -i $TEXT_TO_SEG -segmented tmp/tokenized_segmented_sentences.txt -o results/segmentation.txt -tokenized_raw tmp/raw_tokenized_text_to_seg.txt -tokenized_id tmp/tokenized_text_to_seg.txt -c N
 
 ### END Generating Output for Checking Quality ###

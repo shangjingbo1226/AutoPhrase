@@ -71,9 +71,10 @@ void parseCommandFlags(int argc, char* argv[])
             }
         } else {
             fprintf(stderr, "=== Current Settings ===\n");
-            fprintf(stderr, "SEGMENTATION_MODEL = %s\n", SEGMENTATION_MODEL.c_str());
-            fprintf(stderr, "SEGMENT_MULTI_WORD_QUALITY_THRESHOLD = %.6f\n", SEGMENT_MULTI_WORD_QUALITY_THRESHOLD);
-            fprintf(stderr, "SEGMENT_SINGLE_WORD_QUALITY_THRESHOLD = %.6f\n", SEGMENT_SINGLE_WORD_QUALITY_THRESHOLD);
+            fprintf(stderr, "Segmentation Model Path = %s\n", SEGMENTATION_MODEL.c_str());
+            fprintf(stderr, "After the phrasal segmentation, only following phrases will be highlighted with <phrase> and </phrase>\n");
+            fprintf(stderr, "\tQ(multi-word phrases) >= %.6f\n", SEGMENT_MULTI_WORD_QUALITY_THRESHOLD);
+            fprintf(stderr, "\tQ(single-word phrases) >= %.6f\n", SEGMENT_SINGLE_WORD_QUALITY_THRESHOLD);
         }
 
         fprintf(stderr, "=======\n");

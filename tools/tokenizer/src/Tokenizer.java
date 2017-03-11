@@ -180,7 +180,10 @@ public class Tokenizer {
             while (reader.ready()) {
                 String line = reader.readLine();
                 Integer pos = line.indexOf('\t');
-                punctuation_mapping.put(line.substring(0,  pos), line.substring(pos + 1, line.length()));
+                String from = line.substring(0,  pos);
+                String to = line.substring(pos + 1, line.length());
+                punctuation_mapping.put(from, to);
+                punctuation_mapping.put(to, to);
             }
             reader.close();
         } catch (FileNotFoundException e) {
@@ -419,7 +422,8 @@ public class Tokenizer {
                                 buffer_token.append(tags.get(i));
                             }
                             output.tagOutput = buffer_token.toString();
-                        } else {
+                        }
+                        if (tag_writer == null || mode.equals("test")) { // we always need raw tokens under the test mode
                             StringBuilder buffer_token = new StringBuilder();
                             for (int i = 0; i < tokens.size(); ++ i) {
                                 if (i > 0) { buffer_token.append(' '); }
@@ -561,6 +565,17 @@ public class Tokenizer {
     }
 
     static LinkedList<String> tokenBuffer = new LinkedList<String>();
+    static LinkedList<String> tokenIDBuffer = new LinkedList<String>();
+
+    private static String nextTokenID(BufferedReader tokenizedReader) throws IOException {
+    	while (tokenIDBuffer.size() == 0) {
+    		String[] tokens = tokenizedReader.readLine().split(" ");
+    		for (String token : tokens) {
+    			tokenIDBuffer.add(token);
+    		}
+    	}
+    	return tokenIDBuffer.removeFirst();
+    }
 
     private static String nextToken(BufferedReader tokenizedReader) throws IOException {
     	while (tokenBuffer.size() == 0) {
@@ -572,20 +587,13 @@ public class Tokenizer {
     	return tokenBuffer.removeFirst();
     }
 
-    private static String nextValidToken(BufferedReader tokenizedReader) throws IOException {
-    	while (true) {
-    		String token = nextToken(tokenizedReader);
-    		if (!punctuation_mapping.containsKey(token)) {
-    			return token;
-    		}
-    	}
-    }
 
-    private static void mappingBackText(String rawFileName, String targetFileName, String segmentedFileName, String tokenizedFileName) throws IOException {
+    private static void mappingBackText(String rawFileName, String targetFileName, String segmentedFileName, String tokenizedRawFileName, String tokenizedIDFileName) throws IOException {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(rawFileName), "UTF8"));
             BufferedReader segmentedReader = new BufferedReader(new InputStreamReader(new FileInputStream(segmentedFileName), "UTF8"));
-            BufferedReader tokenizedReader = new BufferedReader(new InputStreamReader(new FileInputStream(tokenizedFileName), "UTF8"));
+            BufferedReader tokenizedRawReader = new BufferedReader(new InputStreamReader(new FileInputStream(tokenizedRawFileName), "UTF8"));
+            BufferedReader tokenizedIDReader = new BufferedReader(new InputStreamReader(new FileInputStream(tokenizedIDFileName), "UTF8"));
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFileName), "UTF8"));
 
             String buffer = "";
@@ -600,7 +608,8 @@ public class Tokenizer {
                     	writer.write("</phrase>");
                     } else {
                     	while (true) {
-                    		String token = nextToken(tokenizedReader);
+                    		String token = nextToken(tokenizedRawReader);
+                    		String tokenID = nextTokenID(tokenizedIDReader);
                     		//System.err.println(toMatch + "\n" + buffer);
                         	while (true) {
                         		int ptr = 0;
@@ -619,14 +628,14 @@ public class Tokenizer {
     	                    	}
                         	}
 
-                    		if (!punctuation_mapping.containsKey(token) && isPhrase) {
+                    		if (!punctuation_mapping.containsKey(tokenID) && isPhrase) {
                     			isPhrase = false;
                     			writer.write("<phrase>");
                     		}
                     		writer.write(buffer.substring(0, token.length()));
                         	buffer = buffer.substring(token.length(), buffer.length());
 
-                        	if (!punctuation_mapping.containsKey(token)) {
+                        	if (!punctuation_mapping.containsKey(tokenID)) {
                     			break;
                     		}
                     	}
@@ -635,7 +644,8 @@ public class Tokenizer {
             }
 
             reader.close();
-            tokenizedReader.close();
+            tokenizedRawReader.close();
+            tokenizedIDReader.close();
             segmentedReader.close();
             writer.close();
         } catch (FileNotFoundException e) {
@@ -746,7 +756,8 @@ public class Tokenizer {
         String targetFileName = "";
         String tokenMappingFileName = "";
         String segmentedFileName = "";
-        String tokenizedFileName = "";
+        String tokenizedRawFileName = "";
+        String tokenizedIDFileName = "";
         threads = Runtime.getRuntime().availableProcessors();
         for (int i = 0; i + 1 < args.length; ++ i) {
             switch (args[i]) {
@@ -756,7 +767,8 @@ public class Tokenizer {
                 case "-i": {rawFileName = args[i + 1]; break;}
                 case "-o": {targetFileName = args[i + 1]; break;}
                 case "-segmented": {segmentedFileName = args[i + 1]; break;}
-                case "-tokenized": {tokenizedFileName = args[i + 1]; break;}
+                case "-tokenized_raw": {tokenizedRawFileName = args[i + 1]; break;}
+                case "-tokenized_id": {tokenizedIDFileName = args[i + 1]; break;}
                 case "-t": {tokenMappingFileName = args[i + 1]; break;}
                 case "-thread": {threads = Math.min(threads, Integer.parseInt(args[i + 1])); break;}
             }
@@ -768,10 +780,10 @@ public class Tokenizer {
             case_sen = "Y";
         }*/
         if (mode.equals("segmentation")) {
-        	if (rawFileName.isEmpty() || targetFileName.isEmpty() || tokenizedFileName.isEmpty() || segmentedFileName.isEmpty()) {
+        	if (rawFileName.isEmpty() || targetFileName.isEmpty() || tokenizedRawFileName.isEmpty() || tokenizedIDFileName.isEmpty() || segmentedFileName.isEmpty()) {
         		System.err.println("[ERROR] Incorrect arguments!!!");
                 System.err.println("[ERROR] Typical arguments:");
-                System.err.println("java -jar tokenizer.jar -m segmentation -i raw.txt -segmented tokenized_segmented.txt -tokenized raw_tokenized.txt -o output.txt -t token_mapping.txt");
+                System.err.println("java -jar tokenizer.jar -m segmentation -i raw.txt -segmented tokenized_segmented.txt -tokenized_raw raw_tokenized.txt -tokenized_id tokenized.txt -o output.txt -t token_mapping.txt");
                 return;
         	}
         } else if (mode.isEmpty() || case_sen.isEmpty() || rawFileName.isEmpty() || targetFileName.isEmpty() || tokenMappingFileName.isEmpty()) {
@@ -796,7 +808,7 @@ public class Tokenizer {
             loadTokenMapping(tokenMappingFileName);
             tokenizeText(rawFileName, targetFileName, language, mode, case_sen);
         } else if (mode.equals("segmentation")) {
-            mappingBackText(rawFileName, targetFileName, segmentedFileName, tokenizedFileName);
+            mappingBackText(rawFileName, targetFileName, segmentedFileName, tokenizedRawFileName, tokenizedIDFileName);
 
         }
         // System.out.println("Task Completed!");
