@@ -252,7 +252,7 @@ public class Tokenizer {
 
     private static boolean hasSuitableAnalyzer(String language) throws IOException {
         switch (language) {
-            case "EN": case "FR": case "DE": case "ES": case "IT": case "PT": case "RU": case "CN": case "JA": case "AR": {return true;}
+            case "EN": case "FR": case "DE": case "ES": case "IT": case "PT": case "RU": case "JA": case "AR": {return true;}
             default: {return false;}
         }
     }
