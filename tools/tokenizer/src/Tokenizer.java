@@ -414,7 +414,7 @@ public class Tokenizer {
 
                     ArrayList<String> tokens = token_pairs.get(0);
                     ArrayList<String> tags = token_pairs.get(1);
-                    if (mode.equals("train") || mode.equals("test")) {
+                    if (mode.equals("train") || mode.equals("test") || mode.equals("direct_test")) {
                         if (tag_writer != null) {
                             StringBuilder buffer_token = new StringBuilder();
                             for (int i = 0; i < tags.size(); ++ i) {
@@ -423,7 +423,7 @@ public class Tokenizer {
                             }
                             output.tagOutput = buffer_token.toString();
                         }
-                        if (tag_writer == null || mode.equals("test")) { // we always need raw tokens under the test mode
+                        if (tag_writer == null || mode.equals("test") || mode.equals("direct_test")) { // we always need raw tokens under the test mode
                             StringBuilder buffer_token = new StringBuilder();
                             for (int i = 0; i < tokens.size(); ++ i) {
                                 if (i > 0) { buffer_token.append(' '); }
@@ -484,7 +484,7 @@ public class Tokenizer {
                         }
                         output.mainOutput = buffer_token.toString();
                         output.caseOutput = buffer_case.toString();
-                    } else if (mode.equals("test")) {
+                    } else if (mode.equals("test") || mode.equals("direct_test")) {
                         StringBuilder buffer_token = new StringBuilder();
                         for (int i = 0; i < tokens.size(); ++ i) {
                             if (i > 0) { buffer_token.append(' '); }
@@ -571,7 +571,7 @@ public class Tokenizer {
     	while (tokenIDBuffer.size() == 0) {
     		String[] tokens = tokenizedReader.readLine().split(" ");
     		for (String token : tokens) {
-    			tokenIDBuffer.add(token);
+    			tokenIDBuffer.add(token.trim());
     		}
     	}
     	return tokenIDBuffer.removeFirst();
@@ -581,7 +581,7 @@ public class Tokenizer {
     	while (tokenBuffer.size() == 0) {
     		String[] tokens = tokenizedReader.readLine().split(" ");
     		for (String token : tokens) {
-    			tokenBuffer.add(token);
+    			tokenBuffer.add(token.trim());
     		}
     	}
     	return tokenBuffer.removeFirst();
@@ -603,42 +603,65 @@ public class Tokenizer {
                 String[] parts = line.split(" ");
                 for (int i = 0; i < parts.length; ++ i) {
                     if (parts[i].equals("<phrase>")) {
-                    	isPhrase = true;
+                        isPhrase = true;
                     } else if (parts[i].equals("</phrase>")) {
-                    	writer.write("</phrase>");
+                        if (!isPhrase) {
+                    	   writer.write("</phrase>");
+                        } else {
+                            isPhrase = false;
+                        }
                     } else {
-                    	while (true) {
-                    		String token = nextToken(tokenizedRawReader);
-                    		String tokenID = nextTokenID(tokenizedIDReader);
-                    		//System.err.println(toMatch + "\n" + buffer);
-                        	while (true) {
-                        		int ptr = 0;
-                        		while (ptr < buffer.length() && Character.isWhitespace(buffer.charAt(ptr))) {
-    	                    		++ ptr;
-    	                    	}
-    	                    	if (ptr > 0) {
-    	                    		writer.write(buffer.substring(0, ptr));
-    	                    		buffer = buffer.substring(ptr, buffer.length());
-    	                    		ptr = 0;
-    	                    	}
-    	                    	if (buffer.length() < token.length()) {
-    	                    		buffer += reader.readLine() + '\n';
-    	                    	} else {
-    	                    		break;
-    	                    	}
-                        	}
+                        boolean found = false;
+                        int loadCount = 0;
+                        //System.err.println("targetTokenID = " + parts[i]);
+                        while (!found) {
+                            String token = nextToken(tokenizedRawReader);
+                            String tokenID = nextTokenID(tokenizedIDReader);
 
-                    		if (!punctuation_mapping.containsKey(tokenID) && isPhrase) {
-                    			isPhrase = false;
-                    			writer.write("<phrase>");
-                    		}
-                    		writer.write(buffer.substring(0, token.length()));
-                        	buffer = buffer.substring(token.length(), buffer.length());
+                            if (punctuation_mapping.containsKey(token)) {
+                                // skip it
+                                continue;
+                            }
 
-                        	if (!punctuation_mapping.containsKey(tokenID)) {
-                    			break;
-                    		}
-                    	}
+                            //System.err.println("tokenID = " + tokenID);
+                            ++ loadCount;
+                            if (loadCount > 10) {
+                                System.err.println("[Fatal Error] Load Limit Exceeded!");
+                                writer.close();
+                                System.exit(-1);
+                            }
+                            
+                            while (buffer.indexOf(token) < 0) {
+                                buffer += reader.readLine() + '\n';
+                                if (buffer.indexOf(token) == -1 && buffer.length() > 10000) {
+                                    System.err.println("buffer = \n" + buffer);
+                                    System.err.println("token = " + token);
+                                    System.err.println("[Fatal Error] Buffer Limit Exceeded!");
+                                    writer.close();
+                                    System.exit(-1);
+                                }
+                            }
+                            int ptr = buffer.indexOf(token);
+                            writer.write(buffer.substring(0, ptr));
+                            buffer = buffer.substring(ptr, buffer.length());
+
+                            if (tokenID.equals(parts[i])) {
+                                found = true;
+                                if (isPhrase) {
+                                    isPhrase = false;
+                                    writer.write("<phrase>");
+                                }
+                            }
+                                
+                            String matched = buffer.substring(0, token.length());
+                            if (!matched.equals(token)) {
+                                System.err.println("[Fatal Error] Match Failed!");
+                                writer.close();
+                                System.exit(-1);
+                            }
+                            writer.write(matched);
+                            buffer = buffer.substring(token.length(), buffer.length());
+                        }
                     }
                 }
             }
@@ -682,7 +705,7 @@ public class Tokenizer {
                 language_writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newTargetFileFolder + "language.txt"), "UTF8"));
                 language_writer.write(language);
                 language_writer.close();
-            } else if (mode.equals("test")) {
+            } else if (mode.equals("test") || mode.equals("direct_test")) {
                 String newTargetFileFolder = "";
                 String[] parts = targetFileName.split("/");
                 for (int j = 0; j < parts.length - 1; j++) {
@@ -725,7 +748,7 @@ public class Tokenizer {
 
             reader.close();
             writer.close();
-            if (mode.equals("train") || mode.equals("test")) {
+            if (mode.equals("train") || mode.equals("test") || mode.equals("direct_test")) {
                 if (case_writer != null) {
                 	case_writer.close();
                 }
@@ -804,7 +827,7 @@ public class Tokenizer {
         if (mode.equals("train")) {
             tokenizeText(rawFileName, targetFileName, language, mode, case_sen);
             saveTokenMapping(tokenMappingFileName);
-        } else if (mode.equals("test") || mode.equals("translate")) {
+        } else if (mode.equals("test") || mode.equals("translate") || mode.equals("direct_test")) {
             loadTokenMapping(tokenMappingFileName);
             tokenizeText(rawFileName, targetFileName, language, mode, case_sen);
         } else if (mode.equals("segmentation")) {
