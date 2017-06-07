@@ -632,7 +632,15 @@ public class Tokenizer {
                             }
                             
                             while (buffer.indexOf(token) < 0) {
-                                buffer += reader.readLine() + '\n';
+				for (int seek = 0; seek < token.length() && reader.ready(); ++ seek) {
+                                    char newChar = (char)reader.read();
+                                    buffer += newChar;
+                                }
+                                // String newLine = reader.readLine();
+                                // if (!newLine.trim().isEmpty()) {
+                                //     buffer += newLine + '\n';
+                                //     ++ lineInReader;
+                                // }
                                 if (buffer.indexOf(token) == -1 && buffer.length() > 10000) {
                                     System.err.println("buffer = \n" + buffer);
                                     System.err.println("token = " + token);
