@@ -625,14 +625,14 @@ public class Tokenizer {
 
                             //System.err.println("tokenID = " + tokenID);
                             ++ loadCount;
-                            if (loadCount > 10) {
-                                System.err.println("[Fatal Error] Load Limit Exceeded!");
+                            if (loadCount > 100) {
+                                System.err.println("[Fatal Error] Load Limit Exceeded! You may want to modify the load limit in the Tokenizer.java");
                                 writer.close();
                                 System.exit(-1);
                             }
                             
                             while (buffer.indexOf(token) < 0) {
-				for (int seek = 0; seek < token.length() && reader.ready(); ++ seek) {
+				                for (int seek = 0; seek < token.length() && reader.ready(); ++ seek) {
                                     char newChar = (char)reader.read();
                                     buffer += newChar;
                                 }
@@ -644,7 +644,7 @@ public class Tokenizer {
                                 if (buffer.indexOf(token) == -1 && buffer.length() > 10000) {
                                     System.err.println("buffer = \n" + buffer);
                                     System.err.println("token = " + token);
-                                    System.err.println("[Fatal Error] Buffer Limit Exceeded!");
+                                    System.err.println("[Fatal Error] Buffer Limit Exceeded! You may want to modify the buffer limit in the Tokenizer.java");
                                     writer.close();
                                     System.exit(-1);
                                 }
