@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
     FrequentPatternMining::mine(MIN_SUP, MAX_LEN);
     // check the patterns
     if (INTERMEDIATE) {
-        vector<pair<int, int>> order;
-        for (int i = 0; i < patterns.size(); ++ i) {
+        vector<pair<TOTAL_TOKENS_TYPE, PATTERN_ID_TYPE>> order;
+        for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
             order.push_back(make_pair(patterns[i].currentFreq, i));
         }
         Dump::dumpRankingList("tmp/frequent_patterns.txt", order);
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 
     cerr << "Constructing label pools..." << endl;
     vector<Pattern> truth = Label::generateAll(LABEL_METHOD, LABEL_FILE, ALL_FILE, QUALITY_FILE);
-    int recognized = Features::recognize(truth);
+    TOTAL_TOKENS_TYPE recognized = Features::recognize(truth);
 
     if (ENABLE_POS_TAGGING) {
         Segmentation::initializePosTags(Documents::posTag2id.size());
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
             double penalty = EPS;
             if (true) {
                 // Binary Search for Length Penalty
-                double lower = EPS, upper = 2000;
+                double lower = EPS, upper = 200;
                 for (int _ = 0; _ < 10; ++ _) {
                     penalty = (lower + upper) / 2;
                     Segmentation segmentation(penalty);

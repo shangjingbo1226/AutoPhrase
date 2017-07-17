@@ -31,7 +31,7 @@ vector<TrieNode> trie;
 void constructTrie() {
     trie.clear();
     trie.push_back(TrieNode());
-    for (int i = 0; i < patterns.size(); ++ i) {
+    for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
         const vector<TOTAL_TOKENS_TYPE>& tokens = patterns[i].tokens;
         if (tokens.size() == 0 || tokens.size() > 1 && patterns[i].currentFreq == 0) {
             continue;
@@ -134,7 +134,7 @@ private:
     void initialize() {
         // compute maximum tokens
         maxLen = 0;
-        for (int i = 0; i < patterns.size(); ++ i) {
+        for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
             maxLen = max(maxLen, patterns[i].size());
         }
 
@@ -162,7 +162,7 @@ public:
         assert(ENABLE_POS_TAGGING == true);
         Segmentation::ENABLE_POS_TAGGING = ENABLE_POS_TAGGING;
         initialize();
-        for (int i = 0; i < patterns.size(); ++ i) {
+        for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
             prob[i] = log(prob[i] + EPS) + log(patterns[i].quality + EPS);
         }
     }
@@ -181,7 +181,7 @@ public:
             pLen[i] /= total;
         }
 
-        for (int i = 0; i < patterns.size(); ++ i) {
+        for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
             prob[i] = log(prob[i] + EPS) + log(pLen[patterns[i].size() - 1]) + log(patterns[i].quality + EPS);
         }
     }
@@ -301,7 +301,7 @@ public:
 
     inline double viterbi_proba_randomPOS(const vector<TOKEN_ID_TYPE> &tokens, vector<double> &f, vector<int> &pre) {
         Pattern pattern;
-        for (int i = 0; i < tokens.size(); ++ i) {
+        for (size_t i = 0; i < tokens.size(); ++ i) {
             pattern.append(tokens[i]);
         }
         assert(pattern2id.count(pattern.hashValue));
@@ -312,7 +312,7 @@ public:
         for (TOTAL_TOKENS_TYPE ed : id2ends[id]) {
             TOTAL_TOKENS_TYPE st = ed - pattern.size() + 1;
             vector<POS_ID_TYPE> tags;
-            for (int i = st; i <= ed; ++ i) {
+            for (TOTAL_TOKENS_TYPE i = st; i <= ed; ++ i) {
                 tags.push_back(Documents::posTags[i]);
             }
             if (memo.count(tags)) {

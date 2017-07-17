@@ -59,35 +59,35 @@ namespace Documents
 
     set<string> separatePunc = {",", ".", "\"", ";", "!", ":", "(", ")", "\""};
 // ===
-    inline bool hasDashAfter(int i) {
+    inline bool hasDashAfter(TOTAL_TOKENS_TYPE i) {
         return 0 <= i && i < totalWordTokens && wordTokenInfo[i].get(DASH_AFTER);
     }
 
-    inline bool hasQuoteBefore(int i) {
+    inline bool hasQuoteBefore(TOTAL_TOKENS_TYPE i) {
         return 0 <= i && i < totalWordTokens && wordTokenInfo[i].get(QUOTE_BEFORE);
     }
 
-    inline bool hasQuoteAfter(int i) {
+    inline bool hasQuoteAfter(TOTAL_TOKENS_TYPE i) {
         return 0 <= i && i < totalWordTokens && wordTokenInfo[i].get(QUOTE_AFTER);
     }
 
-    inline bool hasParentThesisBefore(int i) {
+    inline bool hasParentThesisBefore(TOTAL_TOKENS_TYPE i) {
         return 0 <= i && i < totalWordTokens && wordTokenInfo[i].get(PARENTHESIS_BEFORE);
     }
 
-    inline bool hasParentThesisAfter(int i) {
+    inline bool hasParentThesisAfter(TOTAL_TOKENS_TYPE i) {
         return 0 <= i && i < totalWordTokens && wordTokenInfo[i].get(PARENTHESIS_AFTER);
     }
 
-    inline bool isFirstCapital(int i) {
+    inline bool isFirstCapital(TOTAL_TOKENS_TYPE i) {
         return 0 <= i && i < totalWordTokens && wordTokenInfo[i].get(FIRST_CAPITAL);
     }
 
-    inline bool isAllCapital(int i) {
+    inline bool isAllCapital(TOTAL_TOKENS_TYPE i) {
         return 0 <= i && i < totalWordTokens && wordTokenInfo[i].get(ALL_CAPITAL);
     }
 
-    inline bool isEndOfSentence(int i) {
+    inline bool isEndOfSentence(TOTAL_TOKENS_TYPE i) {
         return i < 0 || i + 1 >= totalWordTokens || wordTokenInfo[i].get(SEPARATOR_AFTER);
     }
 
@@ -114,11 +114,11 @@ namespace Documents
         if (true) {
             // get total number of tokens and the maximum number of tokens
             FILE* in = tryOpen(docFile, "r");
-            int totalTokens = 0;
+            TOTAL_TOKENS_TYPE totalTokens = 0;
             for (;fscanf(in, "%s", line) == 1; ++ totalTokens) {
                 bool flag = true;
                 TOKEN_ID_TYPE id = 0;
-                for (int i = 0; line[i] && flag; ++ i) {
+                for (TOTAL_TOKENS_TYPE i = 0; line[i] && flag; ++ i) {
                     flag &= isdigit(line[i]);
                     id = id * 10 + line[i] - '0';
                 }
@@ -137,7 +137,7 @@ namespace Documents
 
         idf = new float[maxTokenID + 1];
         isDigital = new bool[maxTokenID + 1];
-        for (int i = 0; i <= maxTokenID; ++ i) {
+        for (TOKEN_ID_TYPE i = 0; i <= maxTokenID; ++ i) {
             isDigital[i] = false;
         }
         wordTokens = new TOKEN_ID_TYPE[totalWordTokens];
@@ -166,7 +166,7 @@ namespace Documents
             stringstream sin(line);
 
             myAssert(getLine(capitalIn), "Captial info file doesn't have enough lines");
-            int capitalPtr = 0;
+            TOTAL_TOKENS_TYPE capitalPtr = 0;
 
             string lastPunc = "";
             for (string temp; sin >> temp;) {
@@ -186,7 +186,7 @@ namespace Documents
                 // get token
                 bool flag = true;
                 TOKEN_ID_TYPE token = 0;
-                for (int i = 0; i < temp.size() && flag; ++ i) {
+                for (size_t i = 0; i < temp.size() && flag; ++ i) {
                     flag &= isdigit(temp[i]);
                     token = token * 10 + temp[i] - '0';
                 }

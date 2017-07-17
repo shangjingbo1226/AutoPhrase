@@ -3,14 +3,27 @@
 
 #include "../utils/utils.h"
 
+// [NOTE!!] If you have a really large input, please uncomment the following define.
+// #define LARGE
+
+#ifdef LARGE
+    typedef long long TOTAL_TOKENS_TYPE;
+    typedef long long PATTERN_ID_TYPE;
+    typedef long long TOKEN_ID_TYPE;
+    typedef long long INDEX_TYPE; // sentence id
+    typedef int POSITION_INDEX_TYPE; // position inside a sentence
+#else
+    typedef int TOTAL_TOKENS_TYPE;
+    typedef int PATTERN_ID_TYPE;
+    typedef int TOKEN_ID_TYPE;
+    typedef int INDEX_TYPE; // sentence id
+    typedef short int POSITION_INDEX_TYPE; // position inside a sentence
+#endif
+
 typedef char PATTERN_LEN_TYPE;
 typedef unsigned char POS_ID_TYPE;
-typedef int TOTAL_TOKENS_TYPE;
-typedef int PATTERN_ID_TYPE;
-typedef int TOKEN_ID_TYPE;
 typedef unsigned long long ULL;
-typedef int INDEX_TYPE; // sentence id
-typedef short int POSITION_INDEX_TYPE; // position inside a sentence
+
 
 const string TRAIN_FILE = "tmp/tokenized_train.txt";
 const string TRAIN_CAPITAL_FILE = "tmp/case_tokenized_train.txt";

@@ -14,7 +14,7 @@ namespace FrequentPatternMining
         int label;
         double probability, quality;
         ULL hashValue;
-        int currentFreq;
+        TOTAL_TOKENS_TYPE currentFreq;
 
         void dump(FILE* out) {
             Binary::write(out, currentFreq);
@@ -137,7 +137,7 @@ namespace FrequentPatternMining
 
     vector<bool> noExpansion, noInitial;
 
-    inline bool pruneByPOSTag(int st, int ed) {
+    inline bool pruneByPOSTag(TOTAL_TOKENS_TYPE st, TOTAL_TOKENS_TYPE ed) {
         if (ENABLE_POS_PRUNE) {
             POS_ID_TYPE lastPos = Documents::posTags[ed];
             if (st == ed && noInitial[lastPos] && noExpansion[lastPos]) {
@@ -179,8 +179,8 @@ namespace FrequentPatternMining
             }
             fclose(in);
 
-            int cntUnigrams = 0, cntExpansions = 0;
-            for (int i = 0; i < noInitial.size(); ++ i) {
+            TOTAL_TOKENS_TYPE cntUnigrams = 0, cntExpansions = 0;
+            for (TOTAL_TOKENS_TYPE i = 0; i < noInitial.size(); ++ i) {
                 cntUnigrams += noInitial[i];
                 cntExpansions += noExpansion[i];
             }
@@ -329,7 +329,7 @@ namespace FrequentPatternMining
             cerr << "total occurrence = " << totalOcc << endl;
         }
 
-        for (int i = 0; i < patterns.size(); ++ i) {
+        for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
             assert(patterns[i].currentFreq == id2ends[i].size() || id2ends[i].size() == 0);
             assert(patterns[i].size() == 0 || patterns[i].size() == 1 || id2ends[i].size() >= MIN_SUP);
         }

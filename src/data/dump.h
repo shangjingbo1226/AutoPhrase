@@ -37,7 +37,7 @@ void loadSegmentationModel(const string& filename)
     size_t cnt = 0;
     Binary::read(in, cnt);
     patterns.resize(cnt);
-    for (int i = 0; i < cnt; ++ i) {
+    for (size_t i = 0; i < cnt; ++ i) {
         patterns[i].load(in);
     }
     cerr << "# of loaded patterns = " << cnt << endl;
@@ -75,7 +75,7 @@ void dumpSegmentationModel(const string& filename)
 
     // quality phrases & unigrams
     size_t cnt = 0;
-    for (int i = 0; i < patterns.size(); ++ i) {
+    for (size_t i = 0; i < patterns.size(); ++ i) {
         if (patterns[i].size() > 1 && patterns[i].currentFreq > 0 || patterns[i].size() == 1 && patterns[i].currentFreq > 0 && unigrams[patterns[i].tokens[0]] >= MIN_SUP) {
             ++ cnt;
         }
@@ -84,7 +84,7 @@ void dumpSegmentationModel(const string& filename)
     if (INTERMEDIATE) {
         cerr << "# of phrases dumped = " << cnt << endl;
     }
-    for (int i = 0; i < patterns.size(); ++ i) {
+    for (size_t i = 0; i < patterns.size(); ++ i) {
         if (patterns[i].size() > 1 && patterns[i].currentFreq > 0 || patterns[i].size() == 1 && patterns[i].currentFreq > 0 && unigrams[patterns[i].tokens[0]] >= MIN_SUP) {
             patterns[i].dump(out);
         }
@@ -128,7 +128,7 @@ void dumpFeatures(const string& filename, const vector<vector<double>>& features
 {
     FILE* out = tryOpen(filename, "w");
     for (Pattern pattern : truth) {
-        int i = FrequentPatternMining::pattern2id[pattern.hashValue];
+        PATTERN_ID_TYPE i = FrequentPatternMining::pattern2id[pattern.hashValue];
         if (features[i].size() > 0) {
             for (int j = 0; j < features[i].size(); ++ j) {
                 fprintf(out, "%.10f%c", features[i][j], j + 1 == features[i].size() ? '\n' : '\t');
@@ -150,12 +150,12 @@ void dumpLabels(const string& filename, const vector<Pattern>& truth)
 }
 
 template<class T>
-void dumpRankingList(const string& filename, vector<pair<T, int>> &order)
+void dumpRankingList(const string& filename, vector<pair<T, PATTERN_ID_TYPE>> &order)
 {
     FILE* out = tryOpen(filename, "w");
     sort(order.rbegin(), order.rend());
-    for (int iter = 0; iter < order.size(); ++ iter) {
-        int i = order[iter].second;
+    for (size_t iter = 0; iter < order.size(); ++ iter) {
+        PATTERN_ID_TYPE i = order[iter].second;
         fprintf(out, "%.10f\t", patterns[i].quality);
         for (int j = 0; j < patterns[i].tokens.size(); ++ j) {
             fprintf(out, "%d%c", patterns[i].tokens[j], j + 1 == patterns[i].tokens.size() ? '\n' : ' ');
@@ -166,8 +166,8 @@ void dumpRankingList(const string& filename, vector<pair<T, int>> &order)
 
 void dumpResults(const string& prefix)
 {
-    vector<pair<double, int>> order;
-    for (int i = 0; i < patterns.size(); ++ i) {
+    vector<pair<double, PATTERN_ID_TYPE>> order;
+    for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
         if (patterns[i].size() > 1 && patterns[i].currentFreq > 0) {
             order.push_back(make_pair(patterns[i].quality, i));
         }
@@ -175,7 +175,7 @@ void dumpResults(const string& prefix)
     dumpRankingList(prefix + "_multi-words.txt", order);
 
     order.clear();
-    for (int i = 0; i < patterns.size(); ++ i) {
+    for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
         if (patterns[i].size() == 1 && patterns[i].currentFreq > 0 && unigrams[patterns[i].tokens[0]] >= MIN_SUP) {
             order.push_back(make_pair(patterns[i].quality, i));
         }
@@ -183,7 +183,7 @@ void dumpResults(const string& prefix)
     dumpRankingList(prefix + "_unigrams.txt", order);
 
     order.clear();
-    for (int i = 0; i < patterns.size(); ++ i) {
+    for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
         if (patterns[i].size() > 1 && patterns[i].currentFreq > 0 || patterns[i].size() == 1 && patterns[i].currentFreq > 0 && unigrams[patterns[i].tokens[0]] >= MIN_SUP) {
             order.push_back(make_pair(patterns[i].quality, i));
         }

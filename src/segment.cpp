@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
             // get token
             bool flag = true;
             TOKEN_ID_TYPE token = 0;
-            for (int i = 0; i < temp.size() && flag; ++ i) {
+            for (size_t i = 0; i < temp.size() && flag; ++ i) {
                 flag &= isdigit(temp[i]) || i == 0 && temp.size() > 1 && temp[0] == '-';
             }
             stringstream sin(temp);
