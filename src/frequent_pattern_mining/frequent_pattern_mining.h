@@ -6,7 +6,7 @@
 
 namespace FrequentPatternMining
 {
-    const ULL MAGIC = 0xabcdef;
+    ULL MAGIC = 0xabcdef;
     const int UNKNOWN_LABEL = -1000000000;
 
     struct Pattern {
@@ -14,7 +14,7 @@ namespace FrequentPatternMining
         int label;
         double probability, quality;
         ULL hashValue;
-        TOTAL_TOKENS_TYPE currentFreq;
+        int currentFreq;
 
         void dump(FILE* out) {
             Binary::write(out, currentFreq);
@@ -105,6 +105,23 @@ namespace FrequentPatternMining
 
 // ===
 
+    bool isPrime(ULL x) {
+        for (ULL y = 2; y * y <= x; ++ y) {
+            if (x % y == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    inline void initialize() {
+        MAGIC = Documents::maxTokenID + 1;
+        while (!isPrime(MAGIC)) {
+            ++ MAGIC;
+        }
+        cerr << "selected MAGIC = " << MAGIC << endl;
+    }
+
     inline void addPatternWithoutLocks(const Pattern& pattern, const TOTAL_TOKENS_TYPE& ed, bool addPosition = true) {
         assert(pattern2id.count(pattern.hashValue));
         PATTERN_ID_TYPE id = pattern2id[pattern.hashValue];
@@ -137,7 +154,7 @@ namespace FrequentPatternMining
 
     vector<bool> noExpansion, noInitial;
 
-    inline bool pruneByPOSTag(TOTAL_TOKENS_TYPE st, TOTAL_TOKENS_TYPE ed) {
+    inline bool pruneByPOSTag(int st, int ed) {
         if (ENABLE_POS_PRUNE) {
             POS_ID_TYPE lastPos = Documents::posTags[ed];
             if (st == ed && noInitial[lastPos] && noExpansion[lastPos]) {
@@ -179,8 +196,8 @@ namespace FrequentPatternMining
             }
             fclose(in);
 
-            TOTAL_TOKENS_TYPE cntUnigrams = 0, cntExpansions = 0;
-            for (TOTAL_TOKENS_TYPE i = 0; i < noInitial.size(); ++ i) {
+            int cntUnigrams = 0, cntExpansions = 0;
+            for (int i = 0; i < noInitial.size(); ++ i) {
                 cntUnigrams += noInitial[i];
                 cntExpansions += noExpansion[i];
             }
@@ -329,7 +346,7 @@ namespace FrequentPatternMining
             cerr << "total occurrence = " << totalOcc << endl;
         }
 
-        for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
+        for (int i = 0; i < patterns.size(); ++ i) {
             assert(patterns[i].currentFreq == id2ends[i].size() || id2ends[i].size() == 0);
             assert(patterns[i].size() == 0 || patterns[i].size() == 1 || id2ends[i].size() >= MIN_SUP);
         }

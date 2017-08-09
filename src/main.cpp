@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
     Documents::splitIntoSentences();
 
     cerr << "Mining frequent phrases..." << endl;
+    FrequentPatternMining::initialize();
     FrequentPatternMining::mine(MIN_SUP, MAX_LEN);
     // check the patterns
     if (INTERMEDIATE) {
