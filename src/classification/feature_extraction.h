@@ -20,45 +20,8 @@ using FrequentPatternMining::unigrams;
 
 namespace Features
 {
-// === global variables ===
-    struct Hist {
-        int timestamp;
-        TOTAL_TOKENS_TYPE *cnt;
-        int *mark;
-        int n;
-
-        Hist(int _n) {
-            n = _n;
-            mark = new int[n];
-            cnt = new TOTAL_TOKENS_TYPE[n];
-            timestamp = 0;
-        }
-
-        inline int get(int i) {
-            assert(0 <= i && i < n);
-            if (mark[i] == timestamp) {
-                return mark[i];
-            } else {
-                return 0;
-            }
-        }
-
-        inline void inc(int i) {
-            assert(0 <= i && i < n);
-            if (mark[i] != timestamp) {
-                mark[i] = timestamp;
-                cnt[i] = 1;
-            } else {
-                ++ cnt[i];
-            }
-        }
-
-        inline void timeflies() {
-            ++ timestamp;
-        }
-    };
 // ===
-    inline int getFrequency(const Pattern &pattern) {
+    inline TOTAL_TOKENS_TYPE getFrequency(const Pattern &pattern) {
         if (pattern2id.count(pattern.hashValue)) {
             return patterns[pattern2id[pattern.hashValue]].currentFreq;
         }
@@ -134,7 +97,7 @@ namespace Features
     }
 
     // ready for parallel
-    void extractPunctuation(int id, vector<double> &feature) {
+    void extractPunctuation(PATTERN_ID_TYPE id, vector<double> &feature) {
         if (id2ends[id].size() == 0) {
             feature.push_back(0);
             feature.push_back(0);
@@ -148,13 +111,13 @@ namespace Features
             assert(Documents::wordTokens[st] == patterns[id].tokens[0]);
 
             bool hasDash = false;
-            for (int j = st; j < ed && !hasDash; ++ j) {
+            for (TOTAL_TOKENS_TYPE j = st; j < ed && !hasDash; ++ j) {
                 hasDash |= Documents::hasDashAfter(j);
             }
             dash += hasDash;
 
             bool isAllCap = true, isAllCAP = true;
-            for (int j = st; j <= ed; ++ j) {
+            for (TOTAL_TOKENS_TYPE j = st; j <= ed; ++ j) {
                 isAllCap &= Documents::isFirstCapital(j);
                 isAllCAP &= Documents::isAllCapital(j);
             }
@@ -175,7 +138,7 @@ namespace Features
     }
 
     // ready for parallel
-    void extractStatistical(int id, vector<double> &feature) {
+    void extractStatistical(PATTERN_ID_TYPE id, vector<double> &feature) {
         const Pattern &pattern = patterns[id];
         if (pattern.currentFreq == 0) {
             feature.push_back(0);
@@ -184,7 +147,7 @@ namespace Features
             feature.push_back(0);
             return;
         }
-        int AB = 0, CD = 0;
+        PATTERN_ID_TYPE AB = 0, CD = 0;
         double best = -1;
         for (int i = 0; i + 1 < pattern.size(); ++ i) {
             Pattern left = pattern.substr(0, i + 1);
@@ -232,12 +195,12 @@ namespace Features
             TOTAL_TOKENS_TYPE st = ed - patterns[id].size() + 1;
             assert(Documents::wordTokens[st] == patterns[id].tokens[0]);
 
-            for (int sentences = 0; st >= 0 && sentences < 2; -- st) {
+            for (TOTAL_TOKENS_TYPE sentences = 0; st >= 0 && sentences < 2; -- st) {
                 if (Documents::isEndOfSentence(st - 1)) {
                     ++ sentences;
                 }
             }
-            for (int sentences = 0; ed < Documents::totalWordTokens && sentences < 2; ++ ed) {
+            for (TOTAL_TOKENS_TYPE sentences = 0; ed < Documents::totalWordTokens && sentences < 2; ++ ed) {
                 if (Documents::isEndOfSentence(ed)) {
                     ++ sentences;
                 }
@@ -269,12 +232,12 @@ namespace Features
         feature.push_back(outsideFeat);
     }
 
-    int recognize(vector<Pattern> &truth) {
+    PATTERN_ID_TYPE recognize(vector<Pattern> &truth) {
         if (INTERMEDIATE) {
             fprintf(stderr, "Loaded Truth = %d\n", truth.size());
         }
-        int truthCnt = 0;
-        for (int i = 0; i < truth.size(); ++ i) {
+        PATTERN_ID_TYPE truthCnt = 0;
+        for (PATTERN_ID_TYPE i = 0; i < truth.size(); ++ i) {
             if (pattern2id.count(truth[i].hashValue)) {
                 ++ truthCnt;
                 PATTERN_ID_TYPE id = pattern2id[truth[i].hashValue];
@@ -318,7 +281,7 @@ namespace Features
     }
 
     // ready for parallel
-    void extractPunctuationUnigram(int id, vector<double> &feature) {
+    void extractPunctuationUnigram(PATTERN_ID_TYPE id, vector<double> &feature) {
         if (id2ends[id].size() == 0) {
             feature.push_back(0);
             feature.push_back(0);
@@ -332,7 +295,7 @@ namespace Features
             assert(Documents::wordTokens[st] == patterns[id].tokens[0]);
 
             bool isAllCap = true, isAllCAP = true;
-            for (int j = st; j <= ed; ++ j) {
+            for (TOTAL_TOKENS_TYPE j = st; j <= ed; ++ j) {
                 isAllCap &= Documents::isFirstCapital(j);
                 isAllCAP &= Documents::isAllCapital(j);
             }
