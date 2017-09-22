@@ -15,7 +15,7 @@ THREAD=${THREAD:- 10}
 ### Begin: Suggested Parameters ###
 MAX_POSITIVES=-1
 LABEL_METHOD=DPDN
-RAW_LABEL_FILE=""
+RAW_LABEL_FILE=${RAW_LABEL_FILE:-""}
 ### End: Suggested Parameters ###
 
 green=`tput setaf 2`
