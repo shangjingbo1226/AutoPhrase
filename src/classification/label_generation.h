@@ -9,6 +9,7 @@
 
 using Documents::totalWordTokens;
 using Documents::wordTokens;
+using Documents::stopwords;
 
 using FrequentPatternMining::Pattern;
 using FrequentPatternMining::patterns;
@@ -143,7 +144,10 @@ inline vector<Pattern> generateAll(string LABEL_METHOD, string LABEL_FILE, strin
             if (patterns[i].size() < 1) {
                 continue;
             }
-            if (include.count(patterns[i].hashValue)) {
+            if (patterns[i].size() == 1 && stopwords.count(patterns[i].tokens[0])) {
+                ret.push_back(patterns[i]);
+                ret.back().label = 0;
+            } else if (include.count(patterns[i].hashValue)) {
                 if (needPos) {
                     ret.push_back(patterns[i]);
                     ret.back().label = 1;

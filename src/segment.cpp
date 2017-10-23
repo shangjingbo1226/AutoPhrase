@@ -40,7 +40,8 @@ void process(const vector<TOTAL_TOKENS_TYPE>& tokens, const vector<POS_ID_TYPE>&
             }
             u = trie[u].children[tokens[k]];
         }
-        quality &= trie[u].id >= 0 && (
+        quality &= trie[u].id == patterns.size() || 
+                   trie[u].id >= 0 && (
                     patterns[trie[u].id].size() > 1 && patterns[trie[u].id].quality >= SEGMENT_MULTI_WORD_QUALITY_THRESHOLD ||
                     patterns[trie[u].id].size() == 1 && patterns[trie[u].id].quality >= SEGMENT_SINGLE_WORD_QUALITY_THRESHOLD
                    );

@@ -17,6 +17,7 @@ namespace Dump
 using FrequentPatternMining::Pattern;
 using FrequentPatternMining::patterns;
 using FrequentPatternMining::pattern2id;
+using FrequentPatternMining::truthPatterns;
 
 void loadSegmentationModel(const string& filename)
 {
@@ -41,6 +42,13 @@ void loadSegmentationModel(const string& filename)
         patterns[i].load(in);
     }
     cerr << "# of loaded patterns = " << cnt << endl;
+
+    Binary::read(in, cnt);
+    truthPatterns.resize(cnt);
+    for (size_t i = 0; i < cnt; ++ i) {
+        truthPatterns[i].load(in);
+    }
+    cerr << "# of loaded truth patterns = " << cnt << endl;
 
     if (flag) {
         // POS Tag mapping
@@ -88,6 +96,15 @@ void dumpSegmentationModel(const string& filename)
         if (patterns[i].size() > 1 && patterns[i].currentFreq > 0 || patterns[i].size() == 1 && patterns[i].currentFreq > 0 && unigrams[patterns[i].tokens[0]] >= MIN_SUP) {
             patterns[i].dump(out);
         }
+    }
+
+    // truth
+    if (INTERMEDIATE) {
+        cerr << "# of truth dumped = " << truthPatterns.size() << endl;
+    }
+    Binary::write(out, truthPatterns.size());
+    for (size_t i = 0; i < truthPatterns.size(); ++ i) {
+        truthPatterns[i].dump(out);
     }
 
     // POS Tag mapping

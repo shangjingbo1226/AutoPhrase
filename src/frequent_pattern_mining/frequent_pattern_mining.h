@@ -99,7 +99,7 @@ namespace FrequentPatternMining
 
 // === global variables ===
     TOTAL_TOKENS_TYPE *unigrams; // 0 .. Documents::maxTokenID
-    vector<Pattern> patterns;
+    vector<Pattern> patterns, truthPatterns;
     vector<vector<TOTAL_TOKENS_TYPE>> id2ends;
     unordered_map<ULL, PATTERN_ID_TYPE> pattern2id;
 

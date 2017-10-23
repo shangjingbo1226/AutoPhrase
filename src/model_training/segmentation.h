@@ -9,10 +9,13 @@ using FrequentPatternMining::Pattern;
 // === global variables ===
 using FrequentPatternMining::patterns;
 using FrequentPatternMining::pattern2id;
+using FrequentPatternMining::truthPatterns;
 using FrequentPatternMining::id2ends;
 using FrequentPatternMining::unigrams;
 
 mutex POSTagMutex[SUFFIX_MASK + 1];
+
+#define TRUTH (patterns.size())
 
 struct TrieNode {
     unordered_map<TOTAL_TOKENS_TYPE, size_t> children;
@@ -31,6 +34,23 @@ vector<TrieNode> trie;
 void constructTrie() {
     trie.clear();
     trie.push_back(TrieNode());
+
+    for (PATTERN_ID_TYPE i = 0; i < truthPatterns.size(); ++ i) {
+        const vector<TOTAL_TOKENS_TYPE>& tokens = patterns[i].tokens;
+        size_t u = 0;
+        for (const TOTAL_TOKENS_TYPE& token : tokens) {
+            if (!trie[u].children.count(token)) {
+                trie[u].children[token] = trie.size();
+                trie.push_back(TrieNode());
+            }
+            u = trie[u].children[token];
+        }
+        trie[u].id = TRUTH;
+    }
+    if (INTERMEDIATE) {
+        cerr << "# of trie nodes = " << trie.size() << endl;
+    }
+
     for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
         const vector<TOTAL_TOKENS_TYPE>& tokens = patterns[i].tokens;
         if (tokens.size() == 0 || tokens.size() > 1 && patterns[i].currentFreq == 0) {
@@ -138,7 +158,7 @@ private:
             maxLen = max(maxLen, patterns[i].size());
         }
 
-        prob = new double[patterns.size()];
+        prob = new double[patterns.size() + 1];
         for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
             prob[i] = 0;
         }
@@ -146,6 +166,7 @@ private:
             prob[i] = patterns[i].currentFreq;
         }
         normalize();
+        prob[patterns.size()] = 0;
     }
 
 public:
@@ -165,6 +186,7 @@ public:
         for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
             prob[i] = log(prob[i] + EPS) + log(patterns[i].quality + EPS);
         }
+        prob[patterns.size()] = 0;
     }
 
     Segmentation(double penalty) {
@@ -184,6 +206,7 @@ public:
         for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
             prob[i] = log(prob[i] + EPS) + log(pLen[patterns[i].size() - 1]) + log(patterns[i].quality + EPS);
         }
+        prob[patterns.size()] = 0;
     }
 
     inline double viterbi(const vector<TOKEN_ID_TYPE> &tokens, vector<double> &f, vector<int> &pre) {

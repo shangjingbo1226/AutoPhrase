@@ -11,6 +11,7 @@
 
 using FrequentPatternMining::Pattern;
 using FrequentPatternMining::patterns;
+using FrequentPatternMining::truthPatterns;
 
 int main(int argc, char* argv[])
 {
@@ -47,6 +48,11 @@ int main(int argc, char* argv[])
 
     cerr << "Constructing label pools..." << endl;
     vector<Pattern> truth = Label::generateAll(LABEL_METHOD, LABEL_FILE, ALL_FILE, QUALITY_FILE);
+    for (Pattern p : truth) {
+        if (p.label == 1) {
+            truthPatterns.push_back(p);
+        }
+    }
     TOTAL_TOKENS_TYPE recognized = Features::recognize(truth);
 
     if (ENABLE_POS_TAGGING) {
