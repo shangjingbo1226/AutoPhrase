@@ -36,7 +36,7 @@ void constructTrie() {
     trie.push_back(TrieNode());
 
     for (PATTERN_ID_TYPE i = 0; i < truthPatterns.size(); ++ i) {
-        const vector<TOTAL_TOKENS_TYPE>& tokens = patterns[i].tokens;
+        const vector<TOTAL_TOKENS_TYPE>& tokens = truthPatterns[i].tokens;
         size_t u = 0;
         for (const TOTAL_TOKENS_TYPE& token : tokens) {
             if (!trie[u].children.count(token)) {
@@ -166,7 +166,7 @@ private:
             prob[i] = patterns[i].currentFreq;
         }
         normalize();
-        prob[patterns.size()] = 0;
+        prob[patterns.size()] = 1;
     }
 
 public:
@@ -456,12 +456,14 @@ public:
                 }
                 if (trie[u].id != -1) {
                     PATTERN_ID_TYPE id = trie[u].id;
-                    separateMutex[id & SUFFIX_MASK].lock();
-                    ++ patterns[id].currentFreq;
-                    if (i - j > 1 || i - j == 1 && unigrams[patterns[id].tokens[0]] >= MIN_SUP) {
-                        id2ends[id].push_back(sentences[senID].first + i - 1);
+                    if (id < patterns.size()) {
+                        separateMutex[id & SUFFIX_MASK].lock();
+                        ++ patterns[id].currentFreq;
+                        if (i - j > 1 || i - j == 1 && unigrams[patterns[id].tokens[0]] >= MIN_SUP) {
+                            id2ends[id].push_back(sentences[senID].first + i - 1);
+                        }
+                        separateMutex[id & SUFFIX_MASK].unlock();
                     }
-                    separateMutex[id & SUFFIX_MASK].unlock();
                 }
     			i = j;
     		}
@@ -504,7 +506,6 @@ public:
                     u = trie[u].children[tokens[k]];
                 }
                 if (trie[u].id != -1) {
-                    PATTERN_ID_TYPE id = trie[u].id;
                     for (int k = j + 1; k < i; ++ k) {
                         int index = tags[k] * cnt.size() + tags[k - 1];
                         POSTagMutex[index & SUFFIX_MASK].lock();

@@ -48,6 +48,9 @@ int main(int argc, char* argv[])
 
     cerr << "Constructing label pools..." << endl;
     vector<Pattern> truth = Label::generateAll(LABEL_METHOD, LABEL_FILE, ALL_FILE, QUALITY_FILE);
+
+    truthPatterns = Label::loadTruthPatterns(QUALITY_FILE);
+    cerr << "# truth patterns = " << truthPatterns.size() << endl;
     for (Pattern p : truth) {
         if (p.label == 1) {
             truthPatterns.push_back(p);

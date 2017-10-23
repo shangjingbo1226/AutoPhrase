@@ -40,6 +40,37 @@ inline vector<Pattern> loadLabels(string filename)
     return ret;
 }
 
+inline vector<Pattern> loadTruthPatterns(string filename)
+{
+    vector<Pattern> ret;
+    FILE* in = tryOpen(filename, "r");
+    while (getLine(in)) {
+        stringstream sin(line);
+        bool valid = true;
+        Pattern p;
+        for (string s; sin >> s;) {
+            bool possibleInt = false;
+            for (int i = 0; i < s.size(); ++ i) {
+                possibleInt |= isdigit(s[i]);
+            }
+            if (possibleInt) {
+                TOKEN_ID_TYPE x;
+                fromString(s, x);
+                if (x < 0) {
+                    valid = false;
+                    break;
+                }
+                p.append(x);
+            }
+        }
+        if (valid) {
+            ret.push_back(p);
+        }
+    }
+    fclose(in);
+    return ret;
+}
+
 inline unordered_set<ULL> loadPatterns(string filename, int MAX_POSITIVE)
 {
     FILE* in = tryOpen(filename, "r");
