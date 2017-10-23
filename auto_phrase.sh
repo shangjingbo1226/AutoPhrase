@@ -1,6 +1,7 @@
 #!/bin/bash
+MODEL=${MODEL:- "models/DBLP"}
 # RAW_TRAIN is the input of AutoPhrase, where each line is a single document.
-RAW_TRAIN=${RAW_TRAIN:- data/DBLP.txt}
+RAW_TRAIN=${RAW_TRAIN:- data/EN/DBLP.txt}
 # When FIRST_RUN is set to 1, AutoPhrase will run all preprocessing. 
 # Otherwise, AutoPhrase directly starts from the current preprocessed data in the tmp/ folder.
 FIRST_RUN=${FIRST_RUN:- 1}
@@ -29,7 +30,7 @@ if [ $COMPILE -eq 1 ]; then
 fi
 
 mkdir -p tmp
-mkdir -p results
+mkdir -p ${MODEL}
 
 if [ $RAW_TRAIN == "data/DBLP.txt" ] && [ ! -e data/DBLP.txt ]; then
     echo ${green}===Downloading Toy Dataset===${reset}
@@ -106,12 +107,17 @@ else
         --min_sup $MIN_SUP
 fi
 
+echo ${green}===Saving Model and Results===${reset}
+
+cp tmp/segmentation.model ${MODEL}/segmentation.model
+cp tmp/token_mapping.txt ${MODEL}/token_mapping.txt
+
 ### END AutoPhrasing ###
 
 echo ${green}===Generating Output===${reset}
-java $TOKENIZER -m translate -i tmp/final_quality_multi-words.txt -o results/AutoPhrase_multi-words.txt -t $TOKEN_MAPPING -c N -thread $THREAD
-java $TOKENIZER -m translate -i tmp/final_quality_unigrams.txt -o results/AutoPhrase_single-word.txt -t $TOKEN_MAPPING -c N -thread $THREAD
-java $TOKENIZER -m translate -i tmp/final_quality_salient.txt -o results/AutoPhrase.txt -t $TOKEN_MAPPING -c N -thread $THREAD
+java $TOKENIZER -m translate -i tmp/final_quality_multi-words.txt -o ${MODEL}/AutoPhrase_multi-words.txt -t $TOKEN_MAPPING -c N -thread $THREAD
+java $TOKENIZER -m translate -i tmp/final_quality_unigrams.txt -o ${MODEL}/AutoPhrase_single-word.txt -t $TOKEN_MAPPING -c N -thread $THREAD
+java $TOKENIZER -m translate -i tmp/final_quality_salient.txt -o ${MODEL}/AutoPhrase.txt -t $TOKEN_MAPPING -c N -thread $THREAD
 
 # java $TOKENIZER -m translate -i tmp/distant_training_only_salient.txt -o results/DistantTraning.txt -t $TOKEN_MAPPING -c N -thread $THREAD
 

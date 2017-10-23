@@ -1,5 +1,9 @@
-SEGMENTATION_MODEL=results/segmentation.model
+MODEL=${MODEL:- "models/DBLP"}
 TEXT_TO_SEG=${TEXT_TO_SEG:-data/EN/DBLP.5K.txt}
+
+SEGMENTATION_MODEL=${MODEL}/segmentation.model
+TOKEN_MAPPING=${MODEL}/token_mapping.txt
+
 HIGHLIGHT_MULTI=0.5
 HIGHLIGHT_SINGLE=0.8
 ENABLE_POS_TAGGING=1
@@ -16,7 +20,7 @@ if [ $COMPILE -eq 1 ]; then
 fi
 
 mkdir -p tmp
-mkdir -p results
+mkdir -p ${MODEL}
 
 ### END Compilation###
 
@@ -25,7 +29,7 @@ echo ${green}===Tokenization===${reset}
 TOKENIZER="-cp .:tools/tokenizer/lib/*:tools/tokenizer/resources/:tools/tokenizer/build/ Tokenizer"
 TOKENIZED_TEXT_TO_SEG=tmp/tokenized_text_to_seg.txt
 CASE=tmp/case_tokenized_text_to_seg.txt
-TOKEN_MAPPING=tmp/token_mapping.txt
+
 
 echo -ne "Current step: Tokenizing input file...\033[0K\r"
 time java $TOKENIZER -m direct_test -i $TEXT_TO_SEG -o $TOKENIZED_TEXT_TO_SEG -t $TOKEN_MAPPING -c N -thread $THREAD
@@ -68,6 +72,6 @@ fi
 ### END Segphrasing ###
 
 echo ${green}===Generating Output===${reset}
-java $TOKENIZER -m segmentation -i $TEXT_TO_SEG -segmented tmp/tokenized_segmented_sentences.txt -o results/segmentation.txt -tokenized_raw tmp/raw_tokenized_text_to_seg.txt -tokenized_id tmp/tokenized_text_to_seg.txt -c N
+java $TOKENIZER -m segmentation -i $TEXT_TO_SEG -segmented tmp/tokenized_segmented_sentences.txt -o ${MODEL}/segmentation.txt -tokenized_raw tmp/raw_tokenized_text_to_seg.txt -tokenized_id tmp/tokenized_text_to_seg.txt -c N
 
 ### END Generating Output for Checking Quality ###

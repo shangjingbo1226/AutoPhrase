@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
 
     cerr << "Dumping results..." << endl;
     Dump::dumpResults("tmp/final_quality");
-    Dump::dumpSegmentationModel("results/segmentation.model");
+    Dump::dumpSegmentationModel("tmp/segmentation.model");
 
     cerr << "Done." << endl;
 
