@@ -31,7 +31,7 @@ vector<TrieNode> trie;
 
 // ===
 
-void constructTrie() {
+void constructTrie(bool duringTraingStage = true) {
     trie.clear();
     trie.push_back(TrieNode());
 
@@ -64,7 +64,9 @@ void constructTrie() {
             }
             u = trie[u].children[token];
         }
-        trie[u].id = TRUTH;
+        if (!duringTraingStage || trie[u].id == -1) {
+            trie[u].id = TRUTH;
+        }
     }
     if (INTERMEDIATE) {
         cerr << "# of trie nodes = " << trie.size() << endl;
