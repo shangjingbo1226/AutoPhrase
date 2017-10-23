@@ -674,6 +674,12 @@ public class Tokenizer {
                 }
             }
 
+            while (reader.ready()) {
+                char newChar = (char)reader.read();
+                buffer += newChar;
+            }
+            writer.write(buffer);
+
             reader.close();
             tokenizedRawReader.close();
             tokenizedIDReader.close();
