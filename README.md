@@ -89,14 +89,14 @@ If domain-specific knowledge bases are available, such as MeSH terms, there are 
 
 #### Tokenizer and POS tagger
 
-In fact, our tokenizer supports many different languages, including Arabics (AR), German (DE), English (EN), Spanish (ES), French (FR), Italian (IT), Japanese (JA), Portuguese (PT), Russian (RU), and Chinese (CN). If the language detection is wrong, you can also manually specify the language by modify the TOKENIZER command in the bash script auto_phrase.sh using the two-letter code for that language. For example, the following one forces the language to be English.
+In fact, our tokenizer supports many different languages, including Arabics (AR), German (DE), English (EN), Spanish (ES), French (FR), Italian (IT), Japanese (JA), Portuguese (PT), Russian (RU), and Chinese (CN). If the language detection is wrong, you can also manually specify the language by modify the ```TOKENIZER``` command in the bash script ```auto_phrase.sh``` using the two-letter code for that language. For example, the following one forces the language to be English.
 ```
 TOKENIZER="-cp .:tools/tokenizer/lib/*:tools/tokenizer/resources/:tools/tokenizer/build/ Tokenizer -l EN"
 ```
 
-We also provide a default tokenizer together with a dummy POS tagger in the tools/tokenizer.
-It uses the StandardTokenizer in Lucene, and always assign a tag UNKNOWN to each token.
-To enable this feature, please add the "-l OTHER" to the TOKENIZER command in the bash script auto_phrase.sh.
+We also provide a default tokenizer together with a dummy POS tagger in the ```tools/tokenizer```.
+It uses the StandardTokenizer in Lucene, and always assign a tag ```UNKNOWN``` to each token.
+To enable this feature, please add the ```-l OTHER"``` to the ```TOKENIZER``` command in the bash script ```auto_phrase.sh```.
 ```
 TOKENIZER="-cp .:tools/tokenizer/lib/*:tools/tokenizer/resources/:tools/tokenizer/build/ Tokenizer -l OTHER"
 ```
