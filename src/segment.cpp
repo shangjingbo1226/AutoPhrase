@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 
     sort(patterns.begin(), patterns.end(), byQuality);
 
-    constructTrie(false); // update the current frequent enough patterns
+    constructTrie(); // update the current frequent enough patterns
 
     Segmentation* segmenter;
     if (ENABLE_POS_TAGGING) {

@@ -185,10 +185,11 @@ public:
         assert(ENABLE_POS_TAGGING == true);
         Segmentation::ENABLE_POS_TAGGING = ENABLE_POS_TAGGING;
         initialize();
+        double maxProb = *max_element(prob, prob + patterns.size());
+        prob[patterns.size()] = log(maxProb + EPS);
         for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
             prob[i] = log(prob[i] + EPS) + log(patterns[i].quality + EPS);
         }
-        prob[patterns.size()] = 0;
     }
 
     Segmentation(double penalty) {
@@ -204,11 +205,11 @@ public:
         for (int i = 0; i <= maxLen; ++ i) {
             pLen[i] /= total;
         }
-
+        double maxProb = *max_element(prob, prob + patterns.size());
+        prob[patterns.size()] = log(maxProb + EPS);
         for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
             prob[i] = log(prob[i] + EPS) + log(pLen[patterns[i].size() - 1]) + log(patterns[i].quality + EPS);
         }
-        prob[patterns.size()] = 0;
     }
 
     inline double viterbi(const vector<TOKEN_ID_TYPE> &tokens, vector<double> &f, vector<int> &pre) {
