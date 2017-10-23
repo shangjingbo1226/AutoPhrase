@@ -35,22 +35,6 @@ void constructTrie() {
     trie.clear();
     trie.push_back(TrieNode());
 
-    for (PATTERN_ID_TYPE i = 0; i < truthPatterns.size(); ++ i) {
-        const vector<TOTAL_TOKENS_TYPE>& tokens = truthPatterns[i].tokens;
-        size_t u = 0;
-        for (const TOTAL_TOKENS_TYPE& token : tokens) {
-            if (!trie[u].children.count(token)) {
-                trie[u].children[token] = trie.size();
-                trie.push_back(TrieNode());
-            }
-            u = trie[u].children[token];
-        }
-        trie[u].id = TRUTH;
-    }
-    if (INTERMEDIATE) {
-        cerr << "# of trie nodes = " << trie.size() << endl;
-    }
-
     for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
         const vector<TOTAL_TOKENS_TYPE>& tokens = patterns[i].tokens;
         if (tokens.size() == 0 || tokens.size() > 1 && patterns[i].currentFreq == 0) {
@@ -65,6 +49,22 @@ void constructTrie() {
             u = trie[u].children[token];
         }
         trie[u].id = i;
+    }
+    if (INTERMEDIATE) {
+        cerr << "# of trie nodes = " << trie.size() << endl;
+    }
+
+    for (PATTERN_ID_TYPE i = 0; i < truthPatterns.size(); ++ i) {
+        const vector<TOTAL_TOKENS_TYPE>& tokens = truthPatterns[i].tokens;
+        size_t u = 0;
+        for (const TOTAL_TOKENS_TYPE& token : tokens) {
+            if (!trie[u].children.count(token)) {
+                trie[u].children[token] = trie.size();
+                trie.push_back(TrieNode());
+            }
+            u = trie[u].children[token];
+        }
+        trie[u].id = TRUTH;
     }
     if (INTERMEDIATE) {
         cerr << "# of trie nodes = " << trie.size() << endl;
