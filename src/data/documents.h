@@ -236,6 +236,9 @@ namespace Documents
                 }
             }
 
+            // The end of line is also a separator.
+            wordTokenInfo[ptr - 1].turnOn(SEPARATOR_AFTER);
+
             set<TOKEN_ID_TYPE> docSet(wordTokens + docStart, wordTokens + ptr);
             FOR (token, docSet) {
                 ++ idf[*token];
