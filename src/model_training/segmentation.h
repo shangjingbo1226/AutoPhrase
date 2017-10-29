@@ -54,7 +54,7 @@ void constructTrie(bool duringTraingStage = true) {
         cerr << "# of trie nodes = " << trie.size() << endl;
     }
 
-    if (!duringTraingStage) {
+    if (true) {
         for (PATTERN_ID_TYPE i = 0; i < truthPatterns.size(); ++ i) {
             const vector<TOTAL_TOKENS_TYPE>& tokens = truthPatterns[i].tokens;
             size_t u = 0;
