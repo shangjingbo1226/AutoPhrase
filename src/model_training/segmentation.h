@@ -54,22 +54,24 @@ void constructTrie(bool duringTraingStage = true) {
         cerr << "# of trie nodes = " << trie.size() << endl;
     }
 
-    for (PATTERN_ID_TYPE i = 0; i < truthPatterns.size(); ++ i) {
-        const vector<TOTAL_TOKENS_TYPE>& tokens = truthPatterns[i].tokens;
-        size_t u = 0;
-        for (const TOTAL_TOKENS_TYPE& token : tokens) {
-            if (!trie[u].children.count(token)) {
-                trie[u].children[token] = trie.size();
-                trie.push_back(TrieNode());
+    if (!duringTraingStage) {
+        for (PATTERN_ID_TYPE i = 0; i < truthPatterns.size(); ++ i) {
+            const vector<TOTAL_TOKENS_TYPE>& tokens = truthPatterns[i].tokens;
+            size_t u = 0;
+            for (const TOTAL_TOKENS_TYPE& token : tokens) {
+                if (!trie[u].children.count(token)) {
+                    trie[u].children[token] = trie.size();
+                    trie.push_back(TrieNode());
+                }
+                u = trie[u].children[token];
             }
-            u = trie[u].children[token];
+            if (trie[u].id == -1) {
+                trie[u].id = TRUTH;
+            }
         }
-        if (!duringTraingStage || trie[u].id == -1) {
-            trie[u].id = TRUTH;
+        if (INTERMEDIATE) {
+            cerr << "# of trie nodes = " << trie.size() << endl;
         }
-    }
-    if (INTERMEDIATE) {
-        cerr << "# of trie nodes = " << trie.size() << endl;
     }
 }
 
