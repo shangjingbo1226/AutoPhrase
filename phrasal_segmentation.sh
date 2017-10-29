@@ -1,5 +1,5 @@
-MODEL=${MODEL:- "models/demo"}
-TEXT_TO_SEG=${TEXT_TO_SEG:-../RecentEvents.txt}
+MODEL=${MODEL:- "models/DBLP"}
+TEXT_TO_SEG=${TEXT_TO_SEG:-data/EN/DBLP.5K.txt}
 
 SEGMENTATION_MODEL=${MODEL}/segmentation.model
 TOKEN_MAPPING=${MODEL}/token_mapping.txt
