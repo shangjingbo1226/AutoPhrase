@@ -1,7 +1,7 @@
 #!/bin/bash
-MODEL=${MODEL:- "models/DBLP"}
+MODEL=${MODEL:- "models/recent"}
 # RAW_TRAIN is the input of AutoPhrase, where each line is a single document.
-RAW_TRAIN=${RAW_TRAIN:- data/DBLP.txt}
+RAW_TRAIN=${RAW_TRAIN:- ../RecentEvents.txt}
 # When FIRST_RUN is set to 1, AutoPhrase will run all preprocessing. 
 # Otherwise, AutoPhrase directly starts from the current preprocessed data in the tmp/ folder.
 FIRST_RUN=${FIRST_RUN:- 1}
@@ -9,9 +9,9 @@ FIRST_RUN=${FIRST_RUN:- 1}
 # Otherwise, a simple length penalty mode as the same as SegPhrase will be used.
 ENABLE_POS_TAGGING=${ENABLE_POS_TAGGING:- 1}
 # A hard threshold of raw frequency is specified for frequent phrase mining, which will generate a candidate set.
-MIN_SUP=${MIN_SUP:- 30}
+MIN_SUP=${MIN_SUP:- 10}
 # You can also specify how many threads can be used for AutoPhrase
-THREAD=${THREAD:- 10}
+THREAD=${THREAD:- 3}
 
 ### Begin: Suggested Parameters ###
 MAX_POSITIVES=-1
@@ -111,6 +111,7 @@ echo ${green}===Saving Model and Results===${reset}
 
 cp tmp/segmentation.model ${MODEL}/segmentation.model
 cp tmp/token_mapping.txt ${MODEL}/token_mapping.txt
+cp tmp/language.txt ${MODEL}/language.txt
 
 ### END AutoPhrasing ###
 
