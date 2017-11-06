@@ -42,8 +42,9 @@ Linux or MacOS with g++ and Java installed.
 
 Ubuntu:
 
-*   g++ 4.8 `$ sudo apt-get install g++-4.8`
-*   Java 8 `$ sudo apt-get install openjdk-8-jre`
+* g++ 4.8 `$ sudo apt-get install g++-4.8`
+* Java 8 `$ sudo apt-get install openjdk-8-jdk`
+* curl `$ sudo apt-get install curl`
 
 MacOS:
 
