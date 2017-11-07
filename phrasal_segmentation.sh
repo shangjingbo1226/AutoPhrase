@@ -34,7 +34,7 @@ CASE=tmp/case_tokenized_text_to_seg.txt
 echo -ne "Current step: Tokenizing input file...\033[0K\r"
 time java $TOKENIZER -m direct_test -i $TEXT_TO_SEG -o $TOKENIZED_TEXT_TO_SEG -t $TOKEN_MAPPING -c N -thread $THREAD
 
-LANGUAGE=`cat {$MODEL}/language.txt`
+LANGUAGE=`cat ${MODEL}/language.txt`
 echo -ne "Detected Language: $LANGUAGE\033[0K\n"
 
 ### END Tokenization ###
