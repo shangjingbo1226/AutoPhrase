@@ -21,7 +21,7 @@
 #endif
 
 typedef char PATTERN_LEN_TYPE;
-typedef unsigned char POS_ID_TYPE;
+typedef char POS_ID_TYPE;
 typedef unsigned long long ULL;
 
 
