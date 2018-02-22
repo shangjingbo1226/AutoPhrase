@@ -636,6 +636,7 @@ public class Tokenizer {
                                     char newChar = (char)reader.read();
                                     buffer += newChar;
                                 }
+                                
                                 // String newLine = reader.readLine();
                                 // if (!newLine.trim().isEmpty()) {
                                 //     buffer += newLine + '\n';
@@ -652,7 +653,6 @@ public class Tokenizer {
                             int ptr = buffer.indexOf(token);
                             writer.write(buffer.substring(0, ptr));
                             buffer = buffer.substring(ptr, buffer.length());
-
                             if (tokenID.equals(parts[i])) {
                                 found = true;
                                 if (isPhrase) {
@@ -728,6 +728,7 @@ public class Tokenizer {
                 }
                 if (language.equals("JA") || language.equals("CN")) {
                     tag_writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newTargetFileFolder + "pos_tags_" + parts[parts.length - 1]), "UTF8"));
+                    raw_writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newTargetFileFolder + "raw_" + parts[parts.length - 1]), "UTF8"));
                 } else {
                     raw_writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newTargetFileFolder + "raw_" + parts[parts.length - 1]), "UTF8"));
                 }
@@ -768,7 +769,8 @@ public class Tokenizer {
                 }
                 if (tag_writer != null) {
                     tag_writer.close();
-                } else {
+                }
+                if (raw_writer != null) {
                     raw_writer.close();
                 }
             }
