@@ -285,17 +285,23 @@ public class Tokenizer {
         String[] results = tagger.tag(line);
         for (String taggedToken : results) {
         	String[] parts = taggedToken.split("/");
-        	if (parts.length == 2) {
-        		tokens.add(parts[0]);
-        		tags.add(parts[1]);
-        	} else if (parts.length > 0) {
+        	if (parts.length >= 2) {
+                String token = "";
+                for (int i = 0; i + 1 < parts.length; ++ i) {
+                    if (i > 0) {
+                        token += "/";
+                    }
+                    token += parts[i];
+                }
+                tokens.add(token);
+                tags.add(parts[parts.length - 1]);
+            } else if (parts.length > 0) {
         		if (parts[0].length() == 1 && Character.isWhitespace(parts[0].charAt(0))) {
         			continue;
         		}
         		tokens.add(parts[0]);
         		tags.add("UNKNOWN");
         	}
-
         }
         arr.add(tokens);
         arr.add(tags);
