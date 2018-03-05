@@ -16,8 +16,8 @@ Please cite the following two papers if you are using our tools. Thanks!
 ## Recent Changes 
 
 ### 2018.03.04
-*   Fix a few bugs during the pre-processing and post-processing.
-*   Add an option for whether forcely highlight the phrases in ```wiki_quality.txt```.
+*   Fix a few bugs during the pre-processing and post-processing, i.e., ```Tokeninzer.java```. Previously, when the corpus contains characters like ```/```, the results could be wrong or errors may occur.
+*   When the phrasal segmentation is serving new text, for the phrases (every token is seen in the traning corpus) provided in the knowledge base (```wiki_quality.txt```), the score is set as ```1.0```. Previously, it was kind of infinite.
 
 ### 2017.10.23
 *   Support extremely large corpus (e.g., 100GB or more). Please comment out the ```// define LARGE``` in the beginning of ```src/utils/parameters.h``` before you run AutoPhrase on such a large corpus.
@@ -25,7 +25,6 @@ Please cite the following two papers if you are using our tools. Thanks!
 *   Stopwords will be treated as low quality single-word phrases.
 *   Model files are saved separately. Please check the variable ```MODEL``` in both ```auto_phrase.sh``` and ```phrasal_segmentation.sh```.
 *   The end of line is also a separator for sentence splitting.
-
 
 ## New Features
 (compared to SegPhrase)
