@@ -51,6 +51,7 @@ import java.util.Properties;
 import org.ansj.domain.Result;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
+import org.ansj.util.MyStaticValue;
 
 class SpecialTagger {
 	public String[] tag(String text) {
@@ -90,7 +91,8 @@ class ChineseTagger extends SpecialTagger{
 
 	@Override
 	public String[] tag(String text) {
-		Result result = tagger.parseStr(text);
+		Result result = tagger.parse(text);
+		MyStaticValue.isRealName = true;
 		String[] ret = new String[result.size()];
 		int ptr = 0;
 		for (Term term : result.getTerms()) {
