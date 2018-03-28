@@ -412,12 +412,14 @@ public:
                 }
                 if (trie[u].id != -1) {
                     PATTERN_ID_TYPE id = trie[u].id;
-                    separateMutex[id & SUFFIX_MASK].lock();
-                    ++ patterns[id].currentFreq;
-                    if (i - j > 1 || i - j == 1 && unigrams[patterns[id].tokens[0]] >= MIN_SUP) {
-                        id2ends[id].push_back(sentences[senID].first + i - 1);
+                    if (id < patterns.size()) {
+                        separateMutex[id & SUFFIX_MASK].lock();
+                        ++ patterns[id].currentFreq;
+                        if (i - j > 1 || i - j == 1 && unigrams[patterns[id].tokens[0]] >= MIN_SUP) {
+                            id2ends[id].push_back(sentences[senID].first + i - 1);
+                        }
+                        separateMutex[id & SUFFIX_MASK].unlock();
                     }
-                    separateMutex[id & SUFFIX_MASK].unlock();
                 }
     			i = j;
     		}
@@ -537,6 +539,100 @@ public:
         }
         return energy;
     }
+
+    inline bool qualify(int id, int length, double multi_thres, double uni_thres) {
+        return id == patterns.size() && ( // These phrases are in the wiki_quality.txt, their quality scores are treated as 1.
+                    length > 1 && 1 >= multi_thres ||
+                    length == 1 && 1 >= uni_thres) || 
+               id < patterns.size() && id >= 0 && (
+                    patterns[id].size() > 1 && patterns[id].quality >= multi_thres ||
+                    patterns[id].size() == 1 && patterns[id].quality >= uni_thres);
+    }
+
+    inline double viterbi_for_testing(const vector<TOKEN_ID_TYPE> &tokens, const vector<POS_ID_TYPE> &tags, vector<double> &f, vector<int> &pre, double multi_thres, double uni_thres) {
+        f.clear();
+        f.resize(tokens.size() + 1, -INF);
+        pre.clear();
+        pre.resize(tokens.size() + 1, -1);
+        f[0] = 0;
+        pre[0] = 0;
+        for (size_t i = 0 ; i < tokens.size(); ++ i) {
+            if (f[i] < -1e80) {
+                continue;
+            }
+            Pattern pattern;
+            double cost = 0;
+            bool impossible = true;
+            for (size_t j = i, u = 0; j < tokens.size(); ++ j) {
+                if (!trie[u].children.count(tokens[j])) {
+                    break;
+                }
+                u = trie[u].children[tokens[j]];
+                if (trie[u].id != -1) {
+                    if (qualify(trie[u].id, j - i + 1, multi_thres, uni_thres)) {
+                        impossible = false;
+                        PATTERN_ID_TYPE id = trie[u].id;
+                        double p = cost + prob[id];
+                        double tagCost = (j + 1 < tokens.size() && tags[j] >= 0 && tags[j + 1] >= 0) ? disconnect[tags[j]][tags[j + 1]] : 0;
+                        if (f[i] + p + tagCost > f[j + 1]) {
+                            f[j + 1] = f[i] + p + tagCost;
+                            pre[j + 1] = i;
+                        }
+                    }
+                }
+                if (j + 1 < tags.size() && tags[j] >= 0 && tags[j + 1] >= 0) {
+                    cost += connect[tags[j]][tags[j + 1]];
+                }
+            }
+            if (impossible) {
+                if (f[i] > f[i + 1]) {
+                    f[i + 1] = f[i];
+                    pre[i + 1] = i;
+                }
+            }
+        }
+        return f[tokens.size()];
+    }
+
+    inline double viterbi_for_testing(const vector<TOKEN_ID_TYPE> &tokens, vector<double> &f, vector<int> &pre, double multi_thres, double uni_thres) {
+        f.clear();
+        f.resize(tokens.size() + 1, -INF);
+        pre.clear();
+        pre.resize(tokens.size() + 1, -1);
+        f[0] = 0;
+        pre[0] = 0;
+        for (size_t i = 0 ; i < tokens.size(); ++ i) {
+            if (f[i] < -1e80) {
+                continue;
+            }
+            bool impossible = true;
+            for (size_t j = i, u = 0; j < tokens.size(); ++ j) {
+                if (!trie[u].children.count(tokens[j])) {
+                    break;
+                }
+                u = trie[u].children[tokens[j]];
+                if (trie[u].id != -1) {
+                    if (qualify(trie[u].id, j - i + 1, multi_thres, uni_thres)) {
+                        impossible = false;
+                        PATTERN_ID_TYPE id = trie[u].id;
+                        double p = prob[id];
+                        if (f[i] + p > f[j + 1]) {
+                            f[j + 1] = f[i] + p;
+                            pre[j + 1] = i;
+                        }
+                    }
+                }
+            }
+            if (impossible) {
+                if (f[i] > f[i + 1]) {
+                    f[i + 1] = f[i];
+                    pre[i + 1] = i;
+                }
+            }
+        }
+        return f[tokens.size()];
+    }
+
 };
 
 const double Segmentation::INF = 1e100;

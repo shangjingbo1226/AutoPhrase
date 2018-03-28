@@ -21,9 +21,9 @@ void process(const vector<TOTAL_TOKENS_TYPE>& tokens, const vector<POS_ID_TYPE>&
 {
     ++ sentences;
     if (ENABLE_POS_TAGGING) {
-        segmenter.viterbi(tokens, tags, f, pre);
+        segmenter.viterbi_for_testing(tokens, tags, f, pre, SEGMENT_MULTI_WORD_QUALITY_THRESHOLD, SEGMENT_SINGLE_WORD_QUALITY_THRESHOLD);
     } else {
-        segmenter.viterbi(tokens, f, pre);
+        segmenter.viterbi_for_testing(tokens, f, pre, SEGMENT_MULTI_WORD_QUALITY_THRESHOLD, SEGMENT_SINGLE_WORD_QUALITY_THRESHOLD);
     }
 
     int i = (int)tokens.size();
