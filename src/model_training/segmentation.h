@@ -65,7 +65,7 @@ void constructTrie(bool duringTraingStage = true) {
                 }
                 u = trie[u].children[token];
             }
-            if (trie[u].id == -1) {
+            if (trie[u].id == -1 || !duringTraingStage) {
                 trie[u].id = TRUTH;
             }
         }
@@ -318,8 +318,9 @@ public:
                 }
             }
             if (impossible) {
-                if (f[i] > f[i + 1]) {
-                    f[i + 1] = f[i];
+                double tagCost = (i + 1 < tokens.size() && tags[i] >= 0 && tags[i + 1] >= 0) ? disconnect[tags[i]][tags[i + 1]] : 0;
+                if (f[i] + tagCost > f[i + 1]) {
+                    f[i + 1] = f[i] + tagCost;
                     pre[i + 1] = i;
                 }
             }
@@ -585,8 +586,9 @@ public:
                 }
             }
             if (impossible) {
-                if (f[i] > f[i + 1]) {
-                    f[i + 1] = f[i];
+                double tagCost = (i + 1 < tokens.size() && tags[i] >= 0 && tags[i + 1] >= 0) ? disconnect[tags[i]][tags[i + 1]] : 0;
+                if (f[i] + tagCost > f[i + 1]) {
+                    f[i + 1] = f[i] + tagCost;
                     pre[i + 1] = i;
                 }
             }
