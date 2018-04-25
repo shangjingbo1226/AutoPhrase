@@ -4,23 +4,22 @@
 
 Please cite the following two papers if you are using our tools. Thanks!
 
-*   Jingbo Shang, Jialu Liu, Meng Jiang, Xiang Ren, Clare R Voss, Jiawei Han, "**[Automated Phrase Mining from Massive Text Corpora](https://arxiv.org/abs/1702.04457)**", submitted to TKDE, under review. arXiv:1702.04457 [cs.CL]
+*   Jingbo Shang, Jialu Liu, Meng Jiang, Xiang Ren, Clare R Voss, Jiawei Han, "**[Automated Phrase Mining from Massive Text Corpora](https://arxiv.org/abs/1702.04457)**", accepted by IEEE Transactions on Knowledge and Data Engineering, Feb. 2018.
 
-*   Jialu Liu\*, Jingbo Shang\*, Chi Wang, Xiang Ren and Jiawei Han, "**[Mining
-    Quality Phrases from Massive Text
-    Corpora](http://jialu.cs.illinois.edu/paper/sigmod2015-liu.pdf)**”, Proc. of
-    2015 ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'15), Melbourne,
-    Australia, May 2015. (\* equally contributed,
-    [slides](http://jialu.cs.illinois.edu/paper/sigmod2015-liu-slides.pdf))
+*   Jialu Liu\*, Jingbo Shang\*, Chi Wang, Xiang Ren and Jiawei Han, "**[Mining Quality Phrases from Massive Text Corpora](http://hanj.cs.illinois.edu/pdf/sigmod15_jliu.pdf)**”, Proc. of 2015 ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'15), Melbourne, Australia, May 2015. (\* equally contributed, [slides](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/sigmod15SegPhrase.pdf))
 
-## Recent Changes (2017.10.23)
+## Recent Changes 
 
+### 2018.03.04
+*   Fix a few bugs during the pre-processing and post-processing, i.e., ```Tokeninzer.java```. Previously, when the corpus contains characters like ```/```, the results could be wrong or errors may occur.
+*   When the phrasal segmentation is serving new text, for the phrases (every token is seen in the traning corpus) provided in the knowledge base (```wiki_quality.txt```), the score is set as ```1.0```. Previously, it was kind of infinite.
+
+### 2017.10.23
 *   Support extremely large corpus (e.g., 100GB or more). Please comment out the ```// define LARGE``` in the beginning of ```src/utils/parameters.h``` before you run AutoPhrase on such a large corpus.
 *   Quality phrases (every token is seen in the raw corpus) provided in the knowledge base will be incorporated during the phrasal segmentation, even their frequencies are smaller than ```MIN_SUP```.
 *   Stopwords will be treated as low quality single-word phrases.
 *   Model files are saved separately. Please check the variable ```MODEL``` in both ```auto_phrase.sh``` and ```phrasal_segmentation.sh```.
 *   The end of line is also a separator for sentence splitting.
-
 
 ## New Features
 (compared to SegPhrase)
