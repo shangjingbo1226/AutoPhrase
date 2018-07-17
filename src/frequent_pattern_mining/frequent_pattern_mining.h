@@ -14,7 +14,7 @@ namespace FrequentPatternMining
         int label;
         double probability, quality;
         ULL hashValue;
-        int currentFreq;
+        TOKEN_ID_TYPE currentFreq;
 
         void dump(FILE* out) {
             Binary::write(out, currentFreq);
@@ -346,7 +346,7 @@ namespace FrequentPatternMining
             cerr << "total occurrence = " << totalOcc << endl;
         }
 
-        for (int i = 0; i < patterns.size(); ++ i) {
+        for (PATTERN_ID_TYPE i = 0; i < patterns.size(); ++ i) {
             assert(patterns[i].currentFreq == id2ends[i].size() || id2ends[i].size() == 0);
             assert(patterns[i].size() == 0 || patterns[i].size() == 1 || id2ends[i].size() >= MIN_SUP);
         }
