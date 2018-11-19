@@ -642,7 +642,12 @@ public class Tokenizer {
                             while (buffer.indexOf(token) < 0) {
 				                for (int seek = 0; seek < token.length() && reader.ready(); ++ seek) {
                                     char newChar = (char)reader.read();
-                                    buffer += newChar;
+                                    //modify for chinese labelback:toLowerCase() 
+                                    //buffer += newChar; 
+                                    String newStr = "";
+                                    newStr += newChar;
+                                    buffer += newStr.toLowerCase();
+                                    //modify end
                                 }
                                 
                                 // String newLine = reader.readLine();
