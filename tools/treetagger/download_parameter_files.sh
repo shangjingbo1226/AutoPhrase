@@ -1,5 +1,6 @@
 CHINESE_URL="http://corpus.leeds.ac.uk/tools/zh/tt-lcmc.tgz"
-ENGLISH_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/english-par-linux-3.2-utf8.bin.gz"
+# ENGLISH_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/english-par-linux-3.2-utf8.bin.gz"
+ENGLISH_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/english.par.gz"
 FRENCH_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/french-par-linux-3.2-utf8.bin.gz"
 GERMAN_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/german-par-linux-3.2-utf8.bin.gz"
 ITALIAN_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/italian-par-linux-3.2-utf8.bin.gz"
@@ -27,6 +28,7 @@ if [ $LANGUAGE == "EN" ] && [ ! -e tools/treetagger/lib/english-utf8.par ];
 then
     curl $ENGLISH_URL --output tmp/english-par-linux-3.2-utf8.bin.gz
     gzip -cd tmp/english-par-linux-3.2-utf8.bin.gz > tools/treetagger/lib/english-utf8.par
+    chmod 775 tools/treetagger/lib/english-utf8.par
     echo 'English parameter file (Linux, UTF8) installed.'
     rm tmp/english-par-linux-3.2-utf8.bin.gz
 fi
