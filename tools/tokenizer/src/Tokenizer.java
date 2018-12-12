@@ -596,7 +596,7 @@ public class Tokenizer {
     }
 
 
-    private static void mappingBackText(String rawFileName, String targetFileName, String segmentedFileName, String tokenizedRawFileName, String tokenizedIDFileName) throws IOException {
+    private static void mappingBackText(String rawFileName, String targetFileName, String segmentedFileName, String tokenizedRawFileName, String tokenizedIDFileName, String language) throws IOException {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(rawFileName), "UTF8"));
             BufferedReader segmentedReader = new BufferedReader(new InputStreamReader(new FileInputStream(segmentedFileName), "UTF8"));
@@ -642,12 +642,15 @@ public class Tokenizer {
                             while (buffer.indexOf(token) < 0) {
 				                for (int seek = 0; seek < token.length() && reader.ready(); ++ seek) {
                                     char newChar = (char)reader.read();
-                                    //modify for chinese labelback:toLowerCase() 
-                                    //buffer += newChar; 
-                                    String newStr = "";
-                                    newStr += newChar;
-                                    buffer += newStr.toLowerCase();
-                                    //modify end
+                                    if (language == "CN") {
+                                        //modify for chinese labelback:toLowerCase() 
+                                        String newStr = "";
+                                        newStr += newChar;
+                                        buffer += newStr.toLowerCase();
+                                        //modify end
+                                    } else {
+                                        buffer += newChar; 
+                                    }
                                 }
                                 
                                 // String newLine = reader.readLine();
@@ -860,7 +863,7 @@ public class Tokenizer {
             loadTokenMapping(tokenMappingFileName);
             tokenizeText(rawFileName, targetFileName, language, mode, case_sen);
         } else if (mode.equals("segmentation")) {
-            mappingBackText(rawFileName, targetFileName, segmentedFileName, tokenizedRawFileName, tokenizedIDFileName);
+            mappingBackText(rawFileName, targetFileName, segmentedFileName, tokenizedRawFileName, tokenizedIDFileName, language);
 
         }
         // System.out.println("Task Completed!");
