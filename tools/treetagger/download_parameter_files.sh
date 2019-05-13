@@ -1,12 +1,11 @@
-CHINESE_URL="http://corpus.leeds.ac.uk/tools/zh/tt-lcmc.tgz"
-# ENGLISH_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/english-par-linux-3.2-utf8.bin.gz"
-ENGLISH_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/english.par.gz"
-FRENCH_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/french-par-linux-3.2-utf8.bin.gz"
-GERMAN_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/german-par-linux-3.2-utf8.bin.gz"
-ITALIAN_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/italian-par-linux-3.2-utf8.bin.gz"
-PORTUGUESE_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/portuguese-par-linux-3.2-utf8.bin.gz"
-RUSSIAN_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/russian-par-linux-3.2-utf8.bin.gz"
-SPANISH_URL="http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/spanish-par-linux-3.2-utf8.bin.gz"
+CHINESE_URL="https://corpus.leeds.ac.uk/tools/zh/tt-lcmc.tgz"
+ENGLISH_URL="https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/english.par.gz"
+FRENCH_URL="https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/french-par-linux-3.2-utf8.bin.gz"
+GERMAN_URL="https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/german-par-linux-3.2-utf8.bin.gz"
+ITALIAN_URL="https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/italian-par-linux-3.2-utf8.bin.gz"
+PORTUGUESE_URL="https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/portuguese-par-linux-3.2-utf8.bin.gz"
+RUSSIAN_URL="https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/russian-par-linux-3.2-utf8.bin.gz"
+SPANISH_URL="https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/spanish-par-linux-3.2-utf8.bin.gz"
 
 if [ $LANGUAGE == "CN" ] && [ ! -e tools/treetagger/lib/zh.par ];
 then
