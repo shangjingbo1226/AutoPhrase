@@ -123,7 +123,7 @@ sudo docker run -v $PWD/results:/autophrase/results -it \
     -e MIN_SUP=30 -e THREAD=10 \
     remenberl/autophrase
 
-./autophrase.sh
+./auto_phrase.sh
 ```
 
 The results will be available in the results folder.
@@ -137,5 +137,5 @@ sudo docker run -v $PWD/data:/autophrase/data -v $PWD/results:/autophrase/result
     -e MIN_SUP=30 -e THREAD=10 \
     remenberl/autophrase
 
-./autophrase.sh
+./auto_phrase.sh
 ```
