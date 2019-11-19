@@ -115,27 +115,46 @@ The quality of phrases in wiki_quality should be very confident, while wiki_all,
 
 ## Docker
 
-###Default Run
+### Default Run
 
 ```
-sudo docker run -v $PWD/results:/autophrase/results -it \
-    -e FIRST_RUN=1 -e ENABLE_POS_TAGGING=1 \
+sudo docker run -v $PWD/models:/autophrase/models -it \
+    -e ENABLE_POS_TAGGING=1 \
     -e MIN_SUP=30 -e THREAD=10 \
     remenberl/autophrase
 
 ./auto_phrase.sh
 ```
 
-The results will be available in the results folder.
+The results will be available in the ```models``` folder. Note that all of the environment variables above have their default values--leaving the assigments out here would produce exactly the
+same results.
 
-###User Specified Input
+### User Specified Input
+
 Assuming the path to input file is ./data/input.txt.
 ```
-sudo docker run -v $PWD/data:/autophrase/data -v $PWD/results:/autophrase/results -it \
+sudo docker run -v $PWD/data:/autophrase/data -v $PWD/models:/autophrase/models -it \
     -e RAW_TRAIN=data/input.txt \
-    -e FIRST_RUN=1 -e ENABLE_POS_TAGGING=1 \
+    -e ENABLE_POS_TAGGING=1 \
     -e MIN_SUP=30 -e THREAD=10 \
+    -e MODEL=models/MyModel
     remenberl/autophrase
 
 ./auto_phrase.sh
 ```
+
+Note that, in a Docker deployment, the (default) ```data``` and ```models``` directories are renamed to ```default_data``` and ```default_models```, respectively, to avoid conflicts with
+mounted external diretories with the same names. It should be noted as well that there's litle point in saving a model to the default models diretory, since all new files are erased when
+the container is exited (and if an external directory is mounted as "models", and no value is specified for "MODEL", the results will be saved in the "models/DBP" subdirectory). The same 
+wrinkle also means that there's little point to running a container with the "FIRST_RUN" variable set to 0.
+
+Because the original data directory will have been been renamed, it's perfectly fine for the user to mount an external directory called "data" and read the corpus from there--and in most 
+cases, there's no need for a user to change the supplied files stored in the default data directory. If such a change is necessary, though, the environment variable that specifies the
+directory in question is "DATA_DIR".
+
+### In Windows
+
+The ```sudo``` command won't work in a Windows bash shell, and in any case isn't needed in an elevated window--replace it with ```winpty```.
+
+In addition, the ```PWD``` variable works a little oddly in MinGW (the Git bash shell), appending ";C" to the end of the path. To prevent this, replace ```$PWD/models:/autophrase/models``` with ```"/${PWD}/models":/autophrase/models```, and ```$PWD/data/autophrase/data``` with ```"/${PWD}/data:/autophrase/data```.
+

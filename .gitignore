@@ -1,0 +1,5 @@
+data/corpus.txt
+Python/
+
+*.orig
+*.pyc

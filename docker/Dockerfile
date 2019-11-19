@@ -14,7 +14,11 @@ RUN \
     echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections  && \
     DEBIAN_FRONTEND=noninteractive  apt-get install -y --force-yes oracle-java8-installer oracle-java8-set-default
 
-RUN \
+# If you have trouble installing Java in the container--or if you need to use OpenJava for licensing reasons--comment out all of the above, 
+# and clone the following container instead:
+# FROM openjdk:8
+
+RUN \   
     echo "===> install g++" && \
     apt-get update && apt-get install -y --force-yes g++
 
@@ -22,18 +26,27 @@ RUN \
     echo "===> install make, curl, perl" && \
     apt-get update && apt-get install -y --force-yes make curl perl
 
-ADD autophrase.tar.gz /
+ARG repo
+ARG branch
+ADD "${repo}/archive/${branch}.zip" /
+RUN \
+    unzip ${branch} && \
+    rm ${branch}.zip && \
+    mv AutoPhrase-${branch} autophrase
 
 RUN \
     echo "===> compile" &&\
-    cd /autophrase && bash compile.sh 
+    cd /autophrase && bash compile.sh &&\
+    chmod 755 tools/treetagger/bin/tree-tagger && \
+    mv data default_data && \
+    mv models default_models
 
 RUN \
     echo "===> clean up..."  && \
     apt-get purge -y --force-yes make && \
     apt-get autoremove -y --purge make && \
     rm -rf /var/cache/oracle-jdk8-installer  && \
-    apt-get clean  && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 ENV COMPILE 0
