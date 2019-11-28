@@ -1,7 +1,28 @@
 #!/bin/bash
-MODEL=${MODEL:- "models/DBLP"}
+# In effect, the commands below check to see if we're running in a Docker container--in that case, the (default) 
+# "data" and "models" directories will have been renamed, in order to avoid conflicts with mounted directories 
+# with the same names.
+#
+# DATA_DIR is the default directory for reading data files.  Because this directory contains not only the default
+# dataset, but also language-specific files and "BAD_POS_TAGS.TXT", in most cases it's a bad idea to change it.
+# However, when this script is run from a Docker container, it's perfectly fine for the user to mount an external
+# directory called "data" and read the corpus from there, since the directory holding the language-specific files
+# and "BAD_POS_TAGS.txt" will have been renamed to "default_data".
+if [ -d "default_data" ]; then
+    DATA_DIR=${DATA_DIR:- default_data}
+else
+    DATA_DIR=${DATA_DIR:- data}
+fi
+# MODEL is the directory in which the resulting model will be saved.
+if [ -d "models" ]; then
+    MODELS_DIR=${MODELS_DIR:- models}
+else
+    MODELS_DIR=${MODELS_DIR:- default_models}
+fi
+MODEL=${MODEL:- ${MODELS_DIR}/DBLP}
 # RAW_TRAIN is the input of AutoPhrase, where each line is a single document.
-RAW_TRAIN=${RAW_TRAIN:- data/DBLP.txt}
+DEFAULT_TRAIN=${DATA_DIR}/EN/DBLP.5K.txt
+RAW_TRAIN=${RAW_TRAIN:- $DEFAULT_TRAIN}
 # When FIRST_RUN is set to 1, AutoPhrase will run all preprocessing. 
 # Otherwise, AutoPhrase directly starts from the current preprocessed data in the tmp/ folder.
 FIRST_RUN=${FIRST_RUN:- 1}
@@ -12,7 +33,6 @@ ENABLE_POS_TAGGING=${ENABLE_POS_TAGGING:- 1}
 MIN_SUP=${MIN_SUP:- 10}
 # You can also specify how many threads can be used for AutoPhrase
 THREAD=${THREAD:- 10}
-
 ### Begin: Suggested Parameters ###
 MAX_POSITIVES=-1
 LABEL_METHOD=DPDN
@@ -22,51 +42,52 @@ RAW_LABEL_FILE=${RAW_LABEL_FILE:-""}
 green=`tput setaf 2`
 reset=`tput sgr0`
 
-echo ${green}===Compilation===${reset}
-
-COMPILE=${COMPILE:- 1}
 if [ $COMPILE -eq 1 ]; then
+    echo ${green}===Compilation===${reset}
+    COMPILE=${COMPILE:- 1}
     bash compile.sh
 fi
 
 mkdir -p tmp
 mkdir -p ${MODEL}
 
-if [ $RAW_TRAIN == "data/DBLP.txt" ] && [ ! -e data/DBLP.txt ]; then
+if [ $RAW_TRAIN == $DEFAULT_TRAIN ] && [ ! -e $DEFAULT_TRAIN ]; then
     echo ${green}===Downloading Toy Dataset===${reset}
-    curl http://dmserv2.cs.illinois.edu/data/DBLP.txt.gz --output data/DBLP.txt.gz
-    gzip -d data/DBLP.txt.gz -f
+    curl http://dmserv2.cs.illinois.edu/data/DBLP.txt.gz --output ${DEFAULT_TRAIN}.gz
+    gzip -d ${DEFAULT_TRAIN}.gz -f
 fi
 
 ### END Compilation###
 
-echo ${green}===Tokenization===${reset}
-
 TOKENIZER="-cp .:tools/tokenizer/lib/*:tools/tokenizer/resources/:tools/tokenizer/build/ Tokenizer"
-TOKENIZED_TRAIN=tmp/tokenized_train.txt
-CASE=tmp/case_tokenized_train.txt
 TOKEN_MAPPING=tmp/token_mapping.txt
 
 if [ $FIRST_RUN -eq 1 ]; then
+    echo ${green}===Tokenization===${reset}
+    TOKENIZED_TRAIN=tmp/tokenized_train.txt
+#    CASE=tmp/case_tokenized_train.txt
     echo -ne "Current step: Tokenizing input file...\033[0K\r"
     time java $TOKENIZER -m train -i $RAW_TRAIN -o $TOKENIZED_TRAIN -t $TOKEN_MAPPING -c N -thread $THREAD
 fi
+
 LANGUAGE=`cat tmp/language.txt`
-echo -ne "Detected Language: $LANGUAGE\033[0K\n"
-TOKENIZED_STOPWORDS=tmp/tokenized_stopwords.txt
-TOKENIZED_ALL=tmp/tokenized_all.txt
-TOKENIZED_QUALITY=tmp/tokenized_quality.txt
-STOPWORDS=data/$LANGUAGE/stopwords.txt
-ALL_WIKI_ENTITIES=data/$LANGUAGE/wiki_all.txt
-QUALITY_WIKI_ENTITIES=data/$LANGUAGE/wiki_quality.txt
 LABEL_FILE=tmp/labels.txt
+
 if [ $FIRST_RUN -eq 1 ]; then
+    echo -ne "Detected Language: $LANGUAGE\033[0K\n"
+    TOKENIZED_STOPWORDS=tmp/tokenized_stopwords.txt
+    TOKENIZED_ALL=tmp/tokenized_all.txt
+    TOKENIZED_QUALITY=tmp/tokenized_quality.txt
+    STOPWORDS=$DATA_DIR/$LANGUAGE/stopwords.txt
+    ALL_WIKI_ENTITIES=$DATA_DIR/$LANGUAGE/wiki_all.txt
+    QUALITY_WIKI_ENTITIES=$DATA_DIR/$LANGUAGE/wiki_quality.txt
     echo -ne "Current step: Tokenizing stopword file...\033[0K\r"
     java $TOKENIZER -m test -i $STOPWORDS -o $TOKENIZED_STOPWORDS -t $TOKEN_MAPPING -c N -thread $THREAD
     echo -ne "Current step: Tokenizing wikipedia phrases...\033[0K\n"
     java $TOKENIZER -m test -i $ALL_WIKI_ENTITIES -o $TOKENIZED_ALL -t $TOKEN_MAPPING -c N -thread $THREAD
     java $TOKENIZER -m test -i $QUALITY_WIKI_ENTITIES -o $TOKENIZED_QUALITY -t $TOKEN_MAPPING -c N -thread $THREAD
 fi  
+
 ### END Tokenization ###
 
 if [[ $RAW_LABEL_FILE = *[!\ ]* ]]; then
@@ -76,9 +97,8 @@ else
 	echo -ne "No provided expert labels.\033[0K\n"
 fi
 
-echo ${green}===Part-Of-Speech Tagging===${reset}
-
 if [ ! $LANGUAGE == "JA" ] && [ ! $LANGUAGE == "CN" ]  && [ ! $LANGUAGE == "OTHER" ]  && [ $ENABLE_POS_TAGGING -eq 1 ] && [ $FIRST_RUN -eq 1 ]; then
+    echo ${green}===Part-Of-Speech Tagging===${reset}
     RAW=tmp/raw_tokenized_train.txt
     export THREAD LANGUAGE RAW
     bash ./tools/treetagger/pos_tag.sh
@@ -93,7 +113,7 @@ if [ $ENABLE_POS_TAGGING -eq 1 ]; then
     time ./bin/segphrase_train \
         --pos_tag \
         --thread $THREAD \
-        --pos_prune data/BAD_POS_TAGS.txt \
+        --pos_prune $DATA_DIR/BAD_POS_TAGS.txt \
         --label_method $LABEL_METHOD \
 		--label $LABEL_FILE \
         --max_positives $MAX_POSITIVES \
