@@ -144,7 +144,7 @@ sudo docker run -v $PWD/data:/autophrase/data -v $PWD/models:/autophrase/models 
 ```
 
 Note that, in a Docker deployment, the (default) ```data``` and ```models``` directories are renamed to ```default_data``` and ```default_models```, respectively, to avoid conflicts with
-mounted external diretories with the same names. It should be noted as well that there's litle point in saving a model to the default models diretory, since all new files are erased when
+mounted external directories with the same names. It should be noted as well that there's litle point in saving a model to the default models directory, since all new files are erased when
 the container is exited (and if an external directory is mounted as "models", and no value is specified for "MODEL", the results will be saved in the "models/DBP" subdirectory). The same 
 wrinkle also means that there's little point to running a container with the "FIRST_RUN" variable set to 0.
 

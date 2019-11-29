@@ -113,7 +113,7 @@ if [ $ENABLE_POS_TAGGING -eq 1 ]; then
     time ./bin/segphrase_train \
         --pos_tag \
         --thread $THREAD \
-        --pos_prune $DATA_DIR/BAD_POS_TAGS.txt \
+        --pos_prune ${DATA_DIR}/BAD_POS_TAGS.txt \
         --label_method $LABEL_METHOD \
 		--label $LABEL_FILE \
         --max_positives $MAX_POSITIVES \
