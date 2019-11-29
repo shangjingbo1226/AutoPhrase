@@ -126,8 +126,8 @@ sudo docker run -v $PWD/models:/autophrase/models -it \
 ./auto_phrase.sh
 ```
 
-The results will be available in the ```models``` folder. Note that all of the environment variables above have their default values--leaving the assigments out here would produce exactly the
-same results.
+The results will be available in the ```models``` folder. Note that all of the environment variables above have their default values--leaving the assigments out here would produce exactly the same results.  (However, in this case, using default values, the results of ```phrasal_segmentation.txt``` would be saved to the
+ internal ```default_models``` directory--this is unavoidable, since the phrasal segmentation app reads from and writes to the same model directory.)
 
 ### User Specified Input
 
