@@ -1,5 +1,7 @@
 data/corpus.txt
 Python/
+results/
+tmp/
 
 *.orig
 *.pyc
