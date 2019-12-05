@@ -1,5 +1,17 @@
-MODEL=${MODEL:- "models/DBLP"}
-TEXT_TO_SEG=${TEXT_TO_SEG:-data/EN/DBLP.5K.txt}
+# As in "auto_phrase.sh", make the default model amd data directories depend on whether or not we're running
+# from a Docker container.
+if [ -d "default_models" ]; then
+    MODELS_DIR=${MODELS_DIR:- default_models}
+else
+    MODELS_DIR=${MODELS_DIR:- models}
+fi
+MODEL=${MODEL:- ${MODELS_DIR}/DBLP}
+if [ -d "default_data" ]; then
+    DATA_DIR=${DATA_DIR:- default_data}
+else
+    DATA_DIR=${DATA_DIR:- data}
+fi
+TEXT_TO_SEG=${TEXT_TO_SEG:- ${DATA_DIR}/EN/DBLP.5K.txt}
 HIGHLIGHT_MULTI=${HIGHLIGHT_MULTI:- 0.5}
 HIGHLIGHT_SINGLE=${HIGHLIGHT_SINGLE:- 0.8}
 

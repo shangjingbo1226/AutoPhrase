@@ -126,8 +126,8 @@ sudo docker run -v $PWD/models:/autophrase/models -it \
 ./auto_phrase.sh
 ```
 
-The results will be available in the ```models``` folder. Note that all of the environment variables above have their default values--leaving the assigments out here would produce exactly the
-same results.
+The results will be available in the ```models``` folder. Note that all of the environment variables above have their default values--leaving the assigments out here would produce exactly the same results.  (However, in this case, using default values, the results of ```phrasal_segmentation.txt``` would be saved to the
+ internal ```default_models``` directory--this is unavoidable, since the phrasal segmentation app reads from and writes to the same model directory.)
 
 ### User Specified Input
 
@@ -137,14 +137,17 @@ sudo docker run -v $PWD/data:/autophrase/data -v $PWD/models:/autophrase/models 
     -e RAW_TRAIN=data/input.txt \
     -e ENABLE_POS_TAGGING=1 \
     -e MIN_SUP=30 -e THREAD=10 \
-    -e MODEL=models/MyModel
+    -e MODEL=models/MyModel \
+    -e TEXT_TO_SEG=data/input.txt \
     remenberl/autophrase
 
 ./auto_phrase.sh
 ```
 
+"RAW_TRAIN" is the training corpus, and "TEXT_TO_SEG" is a corpus whose phrases are to be highlighted--typically, this is the same corpus, but training and phrasal segmentation use two different scripts.  When the user wants to segment a new corpus with an existing model, only the latter script need be used (and setting "RAW_TRAIN" isn't necessary).
+
 Note that, in a Docker deployment, the (default) ```data``` and ```models``` directories are renamed to ```default_data``` and ```default_models```, respectively, to avoid conflicts with
-mounted external diretories with the same names. It should be noted as well that there's litle point in saving a model to the default models diretory, since all new files are erased when
+mounted external directories with the same names. It should be noted as well that there's litle point in saving a model to the default models directory, since all new files are erased when
 the container is exited (and if an external directory is mounted as "models", and no value is specified for "MODEL", the results will be saved in the "models/DBP" subdirectory). The same 
 wrinkle also means that there's little point to running a container with the "FIRST_RUN" variable set to 0.
 
