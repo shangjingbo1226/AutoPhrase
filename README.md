@@ -137,11 +137,14 @@ sudo docker run -v $PWD/data:/autophrase/data -v $PWD/models:/autophrase/models 
     -e RAW_TRAIN=data/input.txt \
     -e ENABLE_POS_TAGGING=1 \
     -e MIN_SUP=30 -e THREAD=10 \
-    -e MODEL=models/MyModel
+    -e MODEL=models/MyModel \
+    -e TEXT_TO_SEG=data/input.txt \
     remenberl/autophrase
 
 ./auto_phrase.sh
 ```
+
+"RAW_TRAIN" is the training corpus, and "TEXT_TO_SEG" is a corpus whose phrases are to be highlighted--typically, this is the same corpus, but training and phrasal segmentation use two different scripts.  When the user wants to segment a new corpus with an existing model, only the latter script need be used (and setting "RAW_TRAIN" isn't necessary).
 
 Note that, in a Docker deployment, the (default) ```data``` and ```models``` directories are renamed to ```default_data``` and ```default_models```, respectively, to avoid conflicts with
 mounted external directories with the same names. It should be noted as well that there's litle point in saving a model to the default models directory, since all new files are erased when
