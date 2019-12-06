@@ -1,5 +1,5 @@
 data/corpus.txt
-models/MyModel
+models/MyModel/
 Python/
 results/
 tmp/
