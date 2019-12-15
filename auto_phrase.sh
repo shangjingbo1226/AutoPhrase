@@ -33,6 +33,7 @@ ENABLE_POS_TAGGING=${ENABLE_POS_TAGGING:- 1}
 MIN_SUP=${MIN_SUP:- 10}
 # You can also specify how many threads can be used for AutoPhrase
 THREAD=${THREAD:- 10}
+COMPILE=${COMPILE:- 1}
 ### Begin: Suggested Parameters ###
 MAX_POSITIVES=-1
 LABEL_METHOD=DPDN
@@ -44,7 +45,6 @@ reset=`tput sgr0`
 
 if [ $COMPILE -eq 1 ]; then
     echo ${green}===Compilation===${reset}
-    COMPILE=${COMPILE:- 1}
     bash compile.sh
 fi
 
