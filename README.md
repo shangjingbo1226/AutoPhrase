@@ -10,6 +10,9 @@ Please cite the following two papers if you are using our tools. Thanks!
 
 ## Recent Changes 
 
+### 2020.06.14
+*   Updates docker image with the git master.
+
 ### 2018.03.04
 *   Fix a few bugs during the pre-processing and post-processing, i.e., ```Tokeninzer.java```. Previously, when the corpus contains characters like ```/```, the results could be wrong or errors may occur.
 *   When the phrasal segmentation is serving new text, for the phrases (every token is seen in the traning corpus) provided in the knowledge base (```wiki_quality.txt```), the score is set as ```1.0```. Previously, it was kind of infinite.
