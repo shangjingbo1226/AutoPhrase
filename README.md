@@ -18,7 +18,7 @@ Please cite the following two papers if you are using our tools. Thanks!
 *   When the phrasal segmentation is serving new text, for the phrases (every token is seen in the traning corpus) provided in the knowledge base (```wiki_quality.txt```), the score is set as ```1.0```. Previously, it was kind of infinite.
 
 ### 2017.10.23
-*   Support extremely large corpus (e.g., 100GB or more). Please comment out the ```// define LARGE``` in the beginning of ```src/utils/parameters.h``` before you run AutoPhrase on such a large corpus.
+*   Support extremely large corpus (e.g., 4GB or more). Please comment out the ```// define LARGE``` in the beginning of ```src/utils/parameters.h``` before you run AutoPhrase on such a large corpus.
 *   Quality phrases (every token is seen in the raw corpus) provided in the knowledge base will be incorporated during the phrasal segmentation, even their frequencies are smaller than ```MIN_SUP```.
 *   Stopwords will be treated as low quality single-word phrases.
 *   Model files are saved separately. Please check the variable ```MODEL``` in both ```auto_phrase.sh``` and ```phrasal_segmentation.sh```.
