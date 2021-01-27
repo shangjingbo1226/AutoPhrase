@@ -624,6 +624,7 @@ public class Tokenizer {
                         //System.err.println("targetTokenID = " + parts[i]);
                         while (!found) {
                             String token = nextToken(tokenizedRawReader);
+			    token = token.toLowerCase();
                             String tokenID = nextTokenID(tokenizedIDReader);
 
                             if (punctuation_mapping.containsKey(token)) {
@@ -642,7 +643,7 @@ public class Tokenizer {
                             while (buffer.indexOf(token) < 0) {
 				                for (int seek = 0; seek < token.length() && reader.ready(); ++ seek) {
                                     char newChar = (char)reader.read();
-                                    if (language == "CN") {
+                                    if (language.equals("CN")) {
                                         //modify for chinese labelback:toLowerCase() 
                                         String newStr = "";
                                         newStr += newChar;
