@@ -20,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -596,6 +598,7 @@ public class Tokenizer {
     }
 
 
+    private static final double NOT_PHRASE = -1.0;
     private static void mappingBackText(String rawFileName, String targetFileName, String segmentedFileName, String tokenizedRawFileName, String tokenizedIDFileName, String language) throws IOException {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(rawFileName), "UTF8"));
@@ -605,18 +608,20 @@ public class Tokenizer {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFileName), "UTF8"));
 
             String buffer = "";
-            boolean isPhrase = false;
+            Double isPhrase = NOT_PHRASE;
+            final Pattern p = Pattern.compile("^<phrase_Q=([01][.][0-9]+)>$");
             while (segmentedReader.ready()) {
                 String line = segmentedReader.readLine();
                 String[] parts = line.split(" ");
                 for (int i = 0; i < parts.length; ++ i) {
-                    if (parts[i].equals("<phrase>")) {
-                        isPhrase = true;
+                    Matcher m = p.matcher(parts[i]);
+                    if (m.matches()) {
+                        isPhrase = Double.parseDouble(m.group(1));
                     } else if (parts[i].equals("</phrase>")) {
-                        if (!isPhrase) {
+                        if (isPhrase == NOT_PHRASE) {
                     	   writer.write("</phrase>");
                         } else {
-                            isPhrase = false;
+                            isPhrase = NOT_PHRASE;
                         }
                     } else {
                         boolean found = false;
@@ -669,11 +674,14 @@ public class Tokenizer {
                             int ptr = buffer.indexOf(token);
                             writer.write(buffer.substring(0, ptr));
                             buffer = buffer.substring(ptr, buffer.length());
+                            
                             if (tokenID.equals(parts[i])) {
                                 found = true;
-                                if (isPhrase) {
-                                    isPhrase = false;
-                                    writer.write("<phrase>");
+                                if (isPhrase != NOT_PHRASE) {
+                                    writer.write("<phrase_Q=");
+                                    writer.write(isPhrase.toString());
+                                    writer.write(">");
+                                    isPhrase = NOT_PHRASE;
                                 }
                             }
                                 

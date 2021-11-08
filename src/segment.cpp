@@ -41,6 +41,7 @@ void process(const vector<TOTAL_TOKENS_TYPE>& tokens, const vector<POS_ID_TYPE>&
             u = trie[u].children[tokens[k]];
         }
         
+        double quality_score = (trie[u].id == patterns.size()? 1 : patterns[trie[u].id].quality);
         quality &= (segmenter.qualify(trie[u].id, i - j, SEGMENT_MULTI_WORD_QUALITY_THRESHOLD, SEGMENT_SINGLE_WORD_QUALITY_THRESHOLD));
 
         if (quality) {
@@ -53,7 +54,9 @@ void process(const vector<TOTAL_TOKENS_TYPE>& tokens, const vector<POS_ID_TYPE>&
             ret.push_back(sout.str());
         }
         if (quality) {
-            ret.push_back("<phrase>");
+            stringstream phrase_xml_tag;
+            phrase_xml_tag << std::setprecision(3) << std::fixed << "<phrase_Q=" << quality_score << ">"; 
+            ret.push_back(phrase_xml_tag.str());
         }
 
         i = j;
