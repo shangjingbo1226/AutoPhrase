@@ -39,11 +39,14 @@ def Load(filename, stopwords, output_filename):
             continue
         tokens = line.strip().split('\t')
         valid = False
-        for token in tokens[2:]:
+        for token in tokens[3:]: # First 3 are name and metadata
             support = int(token.split(':')[-2])
             percentage = float(token.split(':')[-1][:-1])
             if (percentage >= MIN_PERCENT) or (support >= MIN_SUP):
-                name = ':'.join(token.split(':')[:-2])
+
+                # Q2736:Association football:15616:0:84% => Association football
+                name = ':'.join(token.split(':')[1:-3]) 
+
                 valid = True
                 if NoSeparator(name) and StopWordChecking(name, stopwords):
                     candidate.add(name.lower())
@@ -58,7 +61,7 @@ def Load(filename, stopwords, output_filename):
             name = simplify(''.join(name.split()))
             seen.add(name)
         candidate = seen
-    print len(candidate)
+    print(len(candidate))
     for name in candidate:
         out.write(name + '\n')
     out.close()
@@ -80,7 +83,7 @@ def main(argv):
             LANGUAGE = argv[i + 1]
             i += 1
         else:
-            print 'Unknown Parameter =', argv[i]
+            print ('Unknown Parameter =', argv[i])
         i += 1
 
     INPUT_FILENAME = LANGUAGE + '/entities'
