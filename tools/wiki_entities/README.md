@@ -4,7 +4,7 @@ Suppose the language is **X**.
 
 1. Find **X**'s Wikipedia dumps and run [WikipediaEntities](https://github.com/kno10/WikipediaEntities). It will generate a file named "entities". Put it in "**X**/entities". 
 
-2. Put a stop word list of **X** at the "**X**/stopwords".
+2. Put a stop word list of **X** at the "**X**/stopwords.txt".
 
 3. Install some depended python packages.
 ```
