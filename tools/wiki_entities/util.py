@@ -2,7 +2,7 @@ import codecs
 import re
 from mafan import simplify
 
-p = re.compile('^Q[0-9]+:.*$')
+NEW_VERSION_PREFIX_REGEXP = re.compile('^Q[0-9]+:.*$')
 
 def join_elements(candidate):
     seen = set()
@@ -20,7 +20,7 @@ def write_file(output_filename, phrase_list):
 
 def get_entry_version(token):
     dots_count = token.count(':')
-    has_qid = (p.match(token) != None)
+    has_qid = (NEW_VERSION_PREFIX_REGEXP.match(token) != None)
 
     if (dots_count == 4) and has_qid:
         return "new"
