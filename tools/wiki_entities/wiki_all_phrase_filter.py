@@ -1,35 +1,26 @@
 import sys
-import codecs
-from mafan import simplify, split_text
-from textblob import TextBlob
+from mafan import simplify
+from util import *
 
 LANGUAGE = 'en'
 
 def Load(filename, output_filename):
+
+    loader = get_file_loader(filename)
+
     candidate = set()
-    for line in codecs.open(filename, 'r', 'utf-8'):
-        tokens = line.strip().split('\t')
-        for token in tokens[3:]: # First 3 are name and metadata
-            
-            # Q2736:Association football:15616:0:84% => Association football
-            name = ':'.join(token.split(':')[1:-3]) 
+    for line_name, entities in loader(filename):
+        for (ent_name, support, percentage) in entities:
+            candidate.add(ent_name.lower())
 
-            if LANGUAGE == 'zh':
-                name = simplify(''.join(name.split()))
-            candidate.add(name.lower())
-
-        name = tokens[0]
-        name = simplify(' '.join(name.split()))
-        if LANGUAGE == 'zh':
-            name = simplify(''.join(name.split()))
-
-        candidate.add(name.lower())
-    print(len(candidate))
+        line_name = simplify(' '.join(line_name.split()))
+        candidate.add(line_name.lower())
     
-    out = codecs.open(output_filename, 'w', 'utf-8')
-    for name in candidate:
-        out.write(name + '\n')
-    out.close()
+    if LANGUAGE == 'zh':
+        candidate = join_elements(candidate)
+
+    print(len(candidate))
+    write_file(output_filename, candidate)
     
 def main(argv):
     global LANGUAGE
