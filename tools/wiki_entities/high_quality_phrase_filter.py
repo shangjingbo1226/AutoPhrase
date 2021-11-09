@@ -1,7 +1,6 @@
 import sys
 import codecs
-from textblob import TextBlob
-from mafan import simplify
+from util import *
 
 MIN_SUP = 100
 MIN_PERCENT = 100
@@ -17,11 +16,13 @@ def StopWordChecking(name, stopwords):
             cnt += 1
     return cnt * 3 < len(tokens)
 
+
 def LoadStopWords(filename):
     stopwords = set()
     for line in codecs.open(filename, 'r', 'utf-8'):
         stopwords.add(line.lower().strip())
     return stopwords
+
 
 def NoSeparator(name):
     for ch in ',;:()':
@@ -29,39 +30,31 @@ def NoSeparator(name):
             return False
     return True
 
+
 def Load(filename, stopwords, output_filename):
     global MIN_PERCENT
     global MIN_SUP
 
+    loader = get_file_loader(filename)
+
     candidate = set()
-    for line in codecs.open(filename, 'r', 'utf-8'):
-        if line[0].isdigit():
-            continue
-        tokens = line.strip().split('\t')
+    for line_name, entities in loader(filename):
         valid = False
-        for token in tokens[2:]:
-            support = int(token.split(':')[-2])
-            percentage = float(token.split(':')[-1][:-1])
+        for (ent_name, support, percentage) in entities: 
+
             if (percentage >= MIN_PERCENT) or (support >= MIN_SUP):
-                name = ':'.join(token.split(':')[:-2])
                 valid = True
-                if NoSeparator(name) and StopWordChecking(name, stopwords):
-                    candidate.add(name.lower())
+                if NoSeparator(ent_name) and StopWordChecking(ent_name, stopwords):
+                    candidate.add(ent_name.lower())
         if valid:
-            name = tokens[0]
-            if NoSeparator(name) and StopWordChecking(name, stopwords):
-                candidate.add(name.lower())
-    out = codecs.open(output_filename, 'w', 'utf-8')
+            if NoSeparator(line_name) and StopWordChecking(line_name, stopwords):
+                candidate.add(line_name.lower())
+
     if LANGUAGE == 'zh':
-        seen = set()
-        for name in candidate:
-            name = simplify(''.join(name.split()))
-            seen.add(name)
-        candidate = seen
-    print len(candidate)
-    for name in candidate:
-        out.write(name + '\n')
-    out.close()
+        candidate = join_elements(candidate)
+
+    print(len(candidate))
+    write_file(output_filename, candidate)
     
 def main(argv):
     global LANGUAGE
@@ -80,7 +73,7 @@ def main(argv):
             LANGUAGE = argv[i + 1]
             i += 1
         else:
-            print 'Unknown Parameter =', argv[i]
+            print ('Unknown Parameter =', argv[i])
         i += 1
 
     INPUT_FILENAME = LANGUAGE + '/entities'
@@ -88,6 +81,7 @@ def main(argv):
     OUTPUT_FILENAME = LANGUAGE + '/wiki_quality.txt'
 
     stopwords = LoadStopWords(STOPWORDS)
+
     Load(INPUT_FILENAME, stopwords, OUTPUT_FILENAME)
 
 if __name__ == '__main__':
