@@ -6,7 +6,7 @@ import argparse
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--lang", type=str, help="language/dir containing files", default="EN")
-    parser.add_argument("--mode", type=str, help="whether its quality or all mode", required=True)
+    parser.add_argument("--mode", type=str, help="`quality` or `all` mode", required=True)
     args = parser.parse_args()
 
     input_filename = os.path.join(args.lang, 'entities')
