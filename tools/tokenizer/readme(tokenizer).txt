@@ -20,3 +20,7 @@ java -jar tokenizer.jar -m translate -l CN -i cn_tokenized.txt -o raw_cn_tokeniz
 java -jar tokenizer.jar -m train -l EN -c N -i en_train.txt -o tokenized_en_train.txt -t token_mapping.txt
 java -jar tokenizer.jar -m test -l EN -c N -i en_test.txt -o tokenized_en_test.txt -t token_mapping.txt
 java -jar tokenizer.jar -m translate -l EN -c N -i en_tokenized.txt -o raw_en_tokenized.txt -t token_mapping.txt
+
+compiling:
+build.xml is a `ant` build file. Once `ant` is installed, run:
+ant compile

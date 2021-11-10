@@ -20,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -605,12 +607,16 @@ public class Tokenizer {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFileName), "UTF8"));
 
             String buffer = "";
+            String phraseScore = "";
             boolean isPhrase = false;
+            
+            final String PHRASE_TAG_PREFFIX = "<phrase_Q=";
             while (segmentedReader.ready()) {
                 String line = segmentedReader.readLine();
                 String[] parts = line.split(" ");
                 for (int i = 0; i < parts.length; ++ i) {
-                    if (parts[i].equals("<phrase>")) {
+                    if (parts[i].startsWith(PHRASE_TAG_PREFFIX)){
+                        phraseScore = parts[i].substring(10, 15);
                         isPhrase = true;
                     } else if (parts[i].equals("</phrase>")) {
                         if (!isPhrase) {
@@ -669,11 +675,14 @@ public class Tokenizer {
                             int ptr = buffer.indexOf(token);
                             writer.write(buffer.substring(0, ptr));
                             buffer = buffer.substring(ptr, buffer.length());
+                            
                             if (tokenID.equals(parts[i])) {
                                 found = true;
                                 if (isPhrase) {
+                                    writer.write("<phrase_Q=");
+                                    writer.write(phraseScore);
+                                    writer.write(">");
                                     isPhrase = false;
-                                    writer.write("<phrase>");
                                 }
                             }
                                 
