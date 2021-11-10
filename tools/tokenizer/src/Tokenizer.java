@@ -598,7 +598,6 @@ public class Tokenizer {
     }
 
 
-    private static final double NOT_PHRASE = -1.0;
     private static void mappingBackText(String rawFileName, String targetFileName, String segmentedFileName, String tokenizedRawFileName, String tokenizedIDFileName, String language) throws IOException {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(rawFileName), "UTF8"));
@@ -608,20 +607,22 @@ public class Tokenizer {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFileName), "UTF8"));
 
             String buffer = "";
-            Double isPhrase = NOT_PHRASE;
-            final Pattern p = Pattern.compile("^<phrase_Q=([01][.][0-9]+)>$");
+            String phraseScore = "";
+            boolean isPhrase = false;
+            
+            final String PHRASE_TAG_PREFFIX = "<phrase_Q=";
             while (segmentedReader.ready()) {
                 String line = segmentedReader.readLine();
                 String[] parts = line.split(" ");
                 for (int i = 0; i < parts.length; ++ i) {
-                    Matcher m = p.matcher(parts[i]);
-                    if (m.matches()) {
-                        isPhrase = Double.parseDouble(m.group(1));
+                    if (parts[i].startsWith(PHRASE_TAG_PREFFIX)){
+                        phraseScore = parts[i].substring(10, 15);
+                        isPhrase = true;
                     } else if (parts[i].equals("</phrase>")) {
-                        if (isPhrase == NOT_PHRASE) {
+                        if (!isPhrase) {
                     	   writer.write("</phrase>");
                         } else {
-                            isPhrase = NOT_PHRASE;
+                            isPhrase = false;
                         }
                     } else {
                         boolean found = false;
@@ -677,11 +678,11 @@ public class Tokenizer {
                             
                             if (tokenID.equals(parts[i])) {
                                 found = true;
-                                if (isPhrase != NOT_PHRASE) {
+                                if (isPhrase) {
                                     writer.write("<phrase_Q=");
-                                    writer.write(isPhrase.toString());
+                                    writer.write(phraseScore);
                                     writer.write(">");
-                                    isPhrase = NOT_PHRASE;
+                                    isPhrase = false;
                                 }
                             }
                                 
