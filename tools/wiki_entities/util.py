@@ -86,3 +86,74 @@ def get_file_loader(entities_filename):
         return iter_entries_old
     else:
         raise Exception
+
+
+def get_stopwords_joint_pred(stopwords, use_head_token_pred, use_end_token_pred, use_token_count_pred):
+    def head_token_pred(tokens):
+        return not tokens[0] in stopwords
+
+    def end_token_pred(tokens):
+        return not tokens[-1] in stopwords
+
+    def token_count_pred(tokens):
+        cnt = 0
+        for token in tokens:
+            if token in stopwords:
+                cnt += 1
+        return cnt * 3 < len(tokens)
+
+    predicates = []
+    if use_head_token_pred: predicates.append(head_token_pred)
+    if use_end_token_pred: predicates.append(end_token_pred)
+    if use_token_count_pred: predicates.append(token_count_pred)
+
+    def joint_predicate(name):
+        tokens = name.lower().split()
+        return all(x(tokens) for x in predicates)
+
+    return joint_predicate
+
+
+def load_stopwords(filename):
+    stopwords = set()
+    for line in codecs.open(filename, 'r', 'utf-8'):
+        stopwords.add(line.lower().strip())
+    return stopwords
+
+
+def no_separator_pred(name):
+    for ch in ',;:()':
+        if name.find(ch) != -1:
+            return False
+    return True
+
+
+def only_alpha_pred(name):
+    name = name.replace(" ", "")
+    return name.isalnum() and not name.isnumeric()
+
+
+def extract_entities(filename, predicates, output_filename, min_perc, min_sup, lang):
+    always_valid = False
+    if max(min_perc, min_sup) == -1:
+        always_valid = True
+
+    loader = get_file_loader(filename)
+
+    candidate = set()
+    for line_name, entities in loader(filename):
+        valid = always_valid
+        for (ent_name, support, percentage) in entities: 
+            if (percentage >= min_perc) or (support >= min_sup):
+                valid = True
+                if(all(pred(ent_name) for pred in predicates)):
+                    candidate.add(ent_name.lower())
+        if valid:
+            if(all(pred(line_name) for pred in predicates)):
+                candidate.add(line_name.lower())
+
+    if lang == 'zh':
+        candidate = join_elements(candidate)
+
+    print(len(candidate))
+    write_file(output_filename, candidate)
