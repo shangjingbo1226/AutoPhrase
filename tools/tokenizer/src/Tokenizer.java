@@ -456,9 +456,7 @@ public class Tokenizer {
                             if (punctuation_mapping.containsKey(token)) {
                                 buffer_token.append(punctuation_mapping.get(token));
                             } else {
-                                if (!token2id.containsKey(token)) {
-                                    token2id.put(token, counter.incrementAndGet());
-                                }
+                                token2id.computeIfAbsent(token, k -> counter.incrementAndGet());
                                 buffer_token.append(String.valueOf(token2id.get(token)));
                             }
                         }
@@ -485,9 +483,7 @@ public class Tokenizer {
                                 buffer_token.append(punctuation_mapping.get(lower_token));
                                 buffer_case.append('3');
                             } else {
-                                if (!token2id.containsKey(lower_token)) {
-                                    token2id.put(lower_token, counter.incrementAndGet());
-                                }
+                                token2id.computeIfAbsent(lower_token, k -> counter.incrementAndGet());
                                 buffer_token.append(String.valueOf(token2id.get(lower_token)));
                                 buffer_case.append(((Integer)((all_digit << 2) ^ (all_upper << 1) ^ first_upper)).toString());
                             }
