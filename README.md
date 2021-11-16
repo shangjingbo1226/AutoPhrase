@@ -116,6 +116,18 @@ You may try to search online or create your own list.
 Meanwhile, you have to add two lists of quality phrases in the ```data/OTHER/wiki_quality.txt``` and ```data/OTHER/wiki_all.txt```. 
 The quality of phrases in wiki_quality should be very confident, while wiki_all, as its superset, could be a little noisy. For more details, please refer to the [tools/wiki_enities](https://github.com/shangjingbo1226/AutoPhrase/tree/master/tools/wiki_entities).
 
+## Use an already tokenized/preprocessed and POS tagged corpus
+
+You can also use AutoPhrase with an already tokenized and tagged corpus. 
+For this, you need to:
+- Set `POS_TAGGING_MODE=${POS_TAGGING_MODE:- 2}` in both `auto_phrase.sh` and `phrasal_segmentation.sh` scripts
+- Place a `pos_tags.txt` file inside your data directory (eg. `data/EN/pos_tags.txt`)
+- Separate your `dataset.txt` (input file) tokens using the whitespace (`' '`) character.
+- Assure that the count of tags in `pos_tags.txt` is equal to the count of tokens in `dataset.txt`.
+
+Note also that, by using such custom input, you can lemmatize or stemm your tokens beforehand and keep the already computed POS tags unchanged.
+
+
 ## Docker
 
 ### Default Run
