@@ -373,7 +373,7 @@ public class Tokenizer {
         int new_start = 0;
         for (int i = 0; i < line.length(); ++i) {
             if (PRETOK_DELIMITERS.indexOf(line.charAt(i)) > -1) { // small search space, O(n) search
-                if(i - new_start > 0){ // avoids adding empty strings due to double spaces
+                if(i - new_start > 0) { // avoids adding empty strings due to double spaces
                     tokens.add(line.substring(new_start, i));
                 }
                 new_start = i + 1;
@@ -381,7 +381,7 @@ public class Tokenizer {
         }
 
         // dealing with the tail
-        if(new_start != line.length()){
+        if(new_start != line.length()) {
             tokens.add(line.substring(new_start, line.length()));
         }        
 
@@ -440,7 +440,7 @@ public class Tokenizer {
                 	Output output = new Output();
                 	ArrayList<ArrayList<String>> token_pairs;
 
-                    if(isPretokenized){
+                    if(isPretokenized) {
                         token_pairs = lineToTokens(line, mode);
                     }else if (!hasSuitableAnalyzer(language)) {
                 		SpecialTagger tagger = getTagger(Thread.currentThread().getName(), language, mode);
@@ -643,7 +643,7 @@ public class Tokenizer {
                 String line = segmentedReader.readLine();
                 String[] parts = line.split(" ");
                 for (int i = 0; i < parts.length; ++ i) {
-                    if (parts[i].startsWith(PHRASE_TAG_PREFFIX)){
+                    if (parts[i].startsWith(PHRASE_TAG_PREFFIX)) {
                         phraseScore = parts[i].substring(10, 15);
                         isPhrase = true;
                     } else if (parts[i].equals("</phrase>")) {
@@ -836,21 +836,21 @@ public class Tokenizer {
     }
 
     private static String PRETOK_DELIMITERS = "";
-    private static void setDelimiters(String rawDelimiters){
+    private static void setDelimiters(String rawDelimiters) {
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < rawDelimiters.length(); ++i){
-            if(rawDelimiters.charAt(i) == '\\'){
-                if(i + 1 < rawDelimiters.length()){
-                    switch(rawDelimiters.charAt(i + 1)){
+        for(int i = 0; i < rawDelimiters.length(); ++i) {
+            if(rawDelimiters.charAt(i) == '\\') {
+                if(i + 1 < rawDelimiters.length()) {
+                    switch(rawDelimiters.charAt(i + 1)) {
                         case 'n': { sb.append('\n'); break; }
                         case 't': { sb.append('\t'); break; }
                     }
                     i++;
-                }else{
+                }else {
                     System.err.println("[ERROR] Using incomplete escaped char!!!");
                     System.exit(1);
                 }
-            }else{
+            }else {
                 sb.append(rawDelimiters.charAt(i));
             }
         }
@@ -891,7 +891,7 @@ public class Tokenizer {
         }
         
         boolean isPretokenized = false;
-        if(!rawDelimiters.equals("")){
+        if(!rawDelimiters.equals("")) {
             setDelimiters(rawDelimiters);
             isPretokenized = true;
         }
