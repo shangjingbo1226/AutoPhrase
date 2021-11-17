@@ -70,7 +70,7 @@ if [ $FIRST_RUN -eq 1 ]; then
 #    CASE=tmp/case_tokenized_train.txt
     echo -ne "Current step: Tokenizing input file...\033[0K\r"
     if [ $POS_TAGGING_MODE -eq 2 ]; then
-        time java $TOKENIZER -m train -i $RAW_TRAIN -o $TOKENIZED_TRAIN -t $TOKEN_MAPPING -c N -thread $THREAD -pretok
+        time java $TOKENIZER -m train -i $RAW_TRAIN -o $TOKENIZED_TRAIN -t $TOKEN_MAPPING -c N -thread $THREAD -delimiters " "
     else
         time java $TOKENIZER -m train -i $RAW_TRAIN -o $TOKENIZED_TRAIN -t $TOKEN_MAPPING -c N -thread $THREAD
     fi    

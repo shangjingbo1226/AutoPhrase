@@ -365,7 +365,6 @@ public class Tokenizer {
         return arr;
     }
 
-    private static char PRETOK_DELIMITER = ' ';
     private static ArrayList<ArrayList<String>> lineToTokens(String line, String mode) throws IOException {
         ArrayList<ArrayList<String>> arr = new ArrayList<ArrayList<String>>(2);
         ArrayList<String> tokens = new ArrayList<String>();
@@ -373,7 +372,7 @@ public class Tokenizer {
 
         int new_start = 0;
         for (int i = 0; i < line.length(); ++i) {
-            if (line.charAt(i) == PRETOK_DELIMITER) {
+            if (PRETOK_DELIMITERS.indexOf(line.charAt(i)) > -1) { // small search space, O(n) search
                 if(i - new_start > 0){ // avoids adding empty strings due to double spaces
                     tokens.add(line.substring(new_start, i));
                 }
@@ -836,6 +835,28 @@ public class Tokenizer {
         return;
     }
 
+    private static String PRETOK_DELIMITERS = "";
+    private static void setDelimiters(String rawDelimiters){
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < rawDelimiters.length(); ++i){
+            if(rawDelimiters.charAt(i) == '\\'){
+                if(i + 1 < rawDelimiters.length()){
+                    switch(rawDelimiters.charAt(i + 1)){
+                        case 'n': { sb.append('\n'); break; }
+                        case 't': { sb.append('\t'); break; }
+                    }
+                    i++;
+                }else{
+                    System.err.println("[ERROR] Using incomplete escaped char!!!");
+                    System.exit(1);
+                }
+            }else{
+                sb.append(rawDelimiters.charAt(i));
+            }
+        }
+        PRETOK_DELIMITERS = sb.toString();
+    }
+
     public static void main(String args[]) throws IOException {
     	long startTime = System.currentTimeMillis();
         // java -jar tokenizer.jar
@@ -851,9 +872,9 @@ public class Tokenizer {
         String segmentedFileName = "";
         String tokenizedRawFileName = "";
         String tokenizedIDFileName = "";
-        boolean isPretokenized = false;
+        String rawDelimiters = "";
         threads = Runtime.getRuntime().availableProcessors();
-        for (int i = 0; i < args.length; ++ i) {
+        for (int i = 0; i + 1 < args.length; ++ i) {
             switch (args[i]) {
                 case "-m": {mode = args[i + 1]; break;}
                 case "-l": {language = args[i + 1]; break;}
@@ -865,8 +886,14 @@ public class Tokenizer {
                 case "-tokenized_id": {tokenizedIDFileName = args[i + 1]; break;}
                 case "-t": {tokenMappingFileName = args[i + 1]; break;}
                 case "-thread": {threads = Math.min(threads, Integer.parseInt(args[i + 1])); break;}
-                case "-pretok": {isPretokenized = true; break;}
+                case "-delimiters": {rawDelimiters = args[i + 1]; break;}
             }
+        }
+        
+        boolean isPretokenized = false;
+        if(!rawDelimiters.equals("")){
+            setDelimiters(rawDelimiters);
+            isPretokenized = true;
         }
 
         if (language.equals("")) {

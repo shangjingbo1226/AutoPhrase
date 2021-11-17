@@ -46,7 +46,7 @@ CASE=tmp/case_tokenized_text_to_seg.txt
 
 echo -ne "Current step: Tokenizing input file...\033[0K\r"
 if [ $POS_TAGGING_MODE -eq 2 ]; then
-    time java $TOKENIZER -m direct_test -i $TEXT_TO_SEG -o $TOKENIZED_TEXT_TO_SEG -t $TOKEN_MAPPING -c N -thread $THREAD -pretok
+    time java $TOKENIZER -m direct_test -i $TEXT_TO_SEG -o $TOKENIZED_TEXT_TO_SEG -t $TOKEN_MAPPING -c N -thread $THREAD -delimiters " "
 else
     time java $TOKENIZER -m direct_test -i $TEXT_TO_SEG -o $TOKENIZED_TEXT_TO_SEG -t $TOKEN_MAPPING -c N -thread $THREAD
 fi
