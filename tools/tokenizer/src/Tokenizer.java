@@ -365,6 +365,31 @@ public class Tokenizer {
         return arr;
     }
 
+    private static ArrayList<ArrayList<String>> lineToTokens(String line, String mode) throws IOException {
+        ArrayList<ArrayList<String>> arr = new ArrayList<ArrayList<String>>(2);
+        ArrayList<String> tokens = new ArrayList<String>();
+        ArrayList<String> tags = new ArrayList<String>(); // empty
+
+        int new_start = 0;
+        for (int i = 0; i < line.length(); ++i) {
+            if (PRETOK_DELIMITERS.indexOf(line.charAt(i)) > -1) { // small search space, O(n) search
+                if(i - new_start > 0) { // avoids adding empty strings due to double spaces
+                    tokens.add(line.substring(new_start, i));
+                }
+                new_start = i + 1;
+            }
+        }
+
+        // dealing with the tail
+        if(new_start != line.length()) {
+            tokens.add(line.substring(new_start, line.length()));
+        }        
+
+        arr.add(tokens);
+        arr.add(tags);
+        return arr;
+    }
+
     private static int isNumeric(String str) {
         try {
             double d = Double.parseDouble(str);
@@ -407,14 +432,17 @@ public class Tokenizer {
     	return analyzers.get(threadName);
     }
 
-    private static void batchMode(ArrayList<String> lines, ArrayList<String> prefixs, BufferedWriter writer, BufferedWriter case_writer, BufferedWriter raw_writer, BufferedWriter tag_writer, String mode, String language, String case_sen) throws IOException {
+    private static void batchMode(ArrayList<String> lines, ArrayList<String> prefixs, BufferedWriter writer, BufferedWriter case_writer, BufferedWriter raw_writer, BufferedWriter tag_writer, String mode, String language, String case_sen, boolean isPretokenized) throws IOException {
         ArrayList<Future<Output>> futures = new ArrayList<Future<Output>>();
         for (final String line : lines) {
             Callable<Output> callable = new Callable<Output>() {
                 public Output call() throws Exception {
                 	Output output = new Output();
                 	ArrayList<ArrayList<String>> token_pairs;
-                	if (!hasSuitableAnalyzer(language)) {
+
+                    if(isPretokenized) {
+                        token_pairs = lineToTokens(line, mode);
+                    }else if (!hasSuitableAnalyzer(language)) {
                 		SpecialTagger tagger = getTagger(Thread.currentThread().getName(), language, mode);
                 		token_pairs = lineToTokens(tagger, line, mode);
                 	} else {
@@ -611,7 +639,7 @@ public class Tokenizer {
                 String line = segmentedReader.readLine();
                 String[] parts = line.split(" ");
                 for (int i = 0; i < parts.length; ++ i) {
-                    if (parts[i].startsWith(PHRASE_TAG_PREFFIX)){
+                    if (parts[i].startsWith(PHRASE_TAG_PREFFIX)) {
                         phraseScore = parts[i].substring(10, 15);
                         isPhrase = true;
                     } else if (parts[i].equals("</phrase>")) {
@@ -713,7 +741,7 @@ public class Tokenizer {
         }
     }
 
-    private static void tokenizeText(String rawFileName, String targetFileName, String language, String mode, String case_sen) throws IOException {
+    private static void tokenizeText(String rawFileName, String targetFileName, String language, String mode, String case_sen, boolean isPretokenized) throws IOException {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(rawFileName), "UTF8"));
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFileName), "UTF8"));
@@ -771,7 +799,7 @@ public class Tokenizer {
                 lines.add(line);
 
                 if (lines.size() == BLOCK_SIZE) {
-                	batchMode(lines, prefixs, writer, case_writer, raw_writer, tag_writer, mode, language, case_sen);
+                	batchMode(lines, prefixs, writer, case_writer, raw_writer, tag_writer, mode, language, case_sen, isPretokenized);
                 	lines.clear();
                 	prefixs.clear();
                 }
@@ -779,7 +807,7 @@ public class Tokenizer {
 
             // dealing with the tail
             if (lines.size() > 0) {
-            	batchMode(lines, prefixs, writer, case_writer, raw_writer, tag_writer, mode, language, case_sen);
+            	batchMode(lines, prefixs, writer, case_writer, raw_writer, tag_writer, mode, language, case_sen, isPretokenized);
             }
 
             reader.close();
@@ -803,6 +831,28 @@ public class Tokenizer {
         return;
     }
 
+    private static String PRETOK_DELIMITERS = "";
+    private static void setDelimiters(String rawDelimiters) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < rawDelimiters.length(); ++i) {
+            if(rawDelimiters.charAt(i) == '\\') {
+                if(i + 1 < rawDelimiters.length()) {
+                    switch(rawDelimiters.charAt(i + 1)) {
+                        case 'n': { sb.append('\n'); break; }
+                        case 't': { sb.append('\t'); break; }
+                    }
+                    i++;
+                }else {
+                    System.err.println("[ERROR] Using incomplete escaped char!!!");
+                    System.exit(1);
+                }
+            }else {
+                sb.append(rawDelimiters.charAt(i));
+            }
+        }
+        PRETOK_DELIMITERS = sb.toString();
+    }
+
     public static void main(String args[]) throws IOException {
     	long startTime = System.currentTimeMillis();
         // java -jar tokenizer.jar
@@ -818,6 +868,7 @@ public class Tokenizer {
         String segmentedFileName = "";
         String tokenizedRawFileName = "";
         String tokenizedIDFileName = "";
+        String rawDelimiters = "";
         threads = Runtime.getRuntime().availableProcessors();
         for (int i = 0; i + 1 < args.length; ++ i) {
             switch (args[i]) {
@@ -831,8 +882,16 @@ public class Tokenizer {
                 case "-tokenized_id": {tokenizedIDFileName = args[i + 1]; break;}
                 case "-t": {tokenMappingFileName = args[i + 1]; break;}
                 case "-thread": {threads = Math.min(threads, Integer.parseInt(args[i + 1])); break;}
+                case "-delimiters": {rawDelimiters = args[i + 1]; break;}
             }
         }
+        
+        boolean isPretokenized = false;
+        if(!rawDelimiters.equals("")) {
+            setDelimiters(rawDelimiters);
+            isPretokenized = true;
+        }
+
         if (language.equals("")) {
             language = detectLanguage(mode.equals("translate") ? tokenMappingFileName : rawFileName);
         }
@@ -862,11 +921,11 @@ public class Tokenizer {
         loadPunctuationMapping(language);
         token2id = new ConcurrentHashMap<String, Integer>();
         if (mode.equals("train")) {
-            tokenizeText(rawFileName, targetFileName, language, mode, case_sen);
+            tokenizeText(rawFileName, targetFileName, language, mode, case_sen, isPretokenized);
             saveTokenMapping(tokenMappingFileName);
         } else if (mode.equals("test") || mode.equals("translate") || mode.equals("direct_test")) {
             loadTokenMapping(tokenMappingFileName);
-            tokenizeText(rawFileName, targetFileName, language, mode, case_sen);
+            tokenizeText(rawFileName, targetFileName, language, mode, case_sen, isPretokenized);
         } else if (mode.equals("segmentation")) {
             mappingBackText(rawFileName, targetFileName, segmentedFileName, tokenizedRawFileName, tokenizedIDFileName, language);
 

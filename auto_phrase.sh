@@ -26,9 +26,10 @@ RAW_TRAIN=${RAW_TRAIN:- $DEFAULT_TRAIN}
 # When FIRST_RUN is set to 1, AutoPhrase will run all preprocessing. 
 # Otherwise, AutoPhrase directly starts from the current preprocessed data in the tmp/ folder.
 FIRST_RUN=${FIRST_RUN:- 1}
-# When ENABLE_POS_TAGGING is set to 1, AutoPhrase will utilize the POS tagging in the phrase mining. 
-# Otherwise, a simple length penalty mode as the same as SegPhrase will be used.
-ENABLE_POS_TAGGING=${ENABLE_POS_TAGGING:- 1}
+# POS_TAGGING_MODE: 0, a simple length penalty mode as the same as SegPhrase will be used.
+#                   1, AutoPhrase will automatically POS tag your text.
+#                   2, AutoPhrase expects an alreaedy tokenized and POS tagged text.
+POS_TAGGING_MODE=${POS_TAGGING_MODE:- 1}
 # A hard threshold of raw frequency is specified for frequent phrase mining, which will generate a candidate set.
 MIN_SUP=${MIN_SUP:- 10}
 # You can also specify how many threads can be used for AutoPhrase
@@ -68,7 +69,11 @@ if [ $FIRST_RUN -eq 1 ]; then
     TOKENIZED_TRAIN=tmp/tokenized_train.txt
 #    CASE=tmp/case_tokenized_train.txt
     echo -ne "Current step: Tokenizing input file...\033[0K\r"
-    time java $TOKENIZER -m train -i $RAW_TRAIN -o $TOKENIZED_TRAIN -t $TOKEN_MAPPING -c N -thread $THREAD
+    if [ $POS_TAGGING_MODE -eq 2 ]; then
+        time java $TOKENIZER -m train -i $RAW_TRAIN -o $TOKENIZED_TRAIN -t $TOKEN_MAPPING -c N -thread $THREAD -delimiters " "
+    else
+        time java $TOKENIZER -m train -i $RAW_TRAIN -o $TOKENIZED_TRAIN -t $TOKEN_MAPPING -c N -thread $THREAD
+    fi    
 fi
 
 LANGUAGE=`cat tmp/language.txt`
@@ -98,19 +103,24 @@ else
 	echo -ne "No provided expert labels.\033[0K\n"
 fi
 
-if [ ! $LANGUAGE == "JA" ] && [ ! $LANGUAGE == "CN" ]  && [ ! $LANGUAGE == "OTHER" ]  && [ $ENABLE_POS_TAGGING -eq 1 ] && [ $FIRST_RUN -eq 1 ]; then
-    echo ${green}===Part-Of-Speech Tagging===${reset}
-    RAW=tmp/raw_tokenized_train.txt
-    export THREAD LANGUAGE RAW
-    bash ./tools/treetagger/pos_tag.sh
-    mv tmp/pos_tags.txt tmp/pos_tags_tokenized_train.txt
+if [ ! $LANGUAGE == "JA" ] && [ ! $LANGUAGE == "CN" ]  && [ ! $LANGUAGE == "OTHER" ] && [ $FIRST_RUN -eq 1 ]; then
+    if [ $POS_TAGGING_MODE -eq 1 ]; then
+        echo ${green}===Part-Of-Speech Tagging===${reset}
+        RAW=tmp/raw_tokenized_train.txt
+        export THREAD LANGUAGE RAW
+        bash ./tools/treetagger/pos_tag.sh
+        mv tmp/pos_tags.txt tmp/pos_tags_tokenized_train.txt
+    elif [ $POS_TAGGING_MODE -eq 2 ]; then
+        echo ${green}===Loading Part-Of-Speech Tagged file===${reset}
+        cp $DATA_DIR/$LANGUAGE/pos_tags.txt tmp/pos_tags_tokenized_train.txt
+    fi
 fi
 
 ### END Part-Of-Speech Tagging ###
 
 echo ${green}===AutoPhrasing===${reset}
 
-if [ $ENABLE_POS_TAGGING -eq 1 ]; then
+if [[ $POS_TAGGING_MODE -eq 1 || $POS_TAGGING_MODE -eq 2 ]]; then
     time ./bin/segphrase_train \
         --pos_tag \
         --thread $THREAD \

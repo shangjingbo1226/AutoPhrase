@@ -19,7 +19,7 @@ HIGHLIGHT_SINGLE=${HIGHLIGHT_SINGLE:- 0.8}
 SEGMENTATION_MODEL=${MODEL}/segmentation.model
 TOKEN_MAPPING=${MODEL}/token_mapping.txt
 
-ENABLE_POS_TAGGING=1
+POS_TAGGING_MODE=${POS_TAGGING_MODE:- 1}
 THREAD=10
 
 green=`tput setaf 2`
@@ -45,20 +45,28 @@ CASE=tmp/case_tokenized_text_to_seg.txt
 
 
 echo -ne "Current step: Tokenizing input file...\033[0K\r"
-time java $TOKENIZER -m direct_test -i $TEXT_TO_SEG -o $TOKENIZED_TEXT_TO_SEG -t $TOKEN_MAPPING -c N -thread $THREAD
+if [ $POS_TAGGING_MODE -eq 2 ]; then
+    time java $TOKENIZER -m direct_test -i $TEXT_TO_SEG -o $TOKENIZED_TEXT_TO_SEG -t $TOKEN_MAPPING -c N -thread $THREAD -delimiters " "
+else
+    time java $TOKENIZER -m direct_test -i $TEXT_TO_SEG -o $TOKENIZED_TEXT_TO_SEG -t $TOKEN_MAPPING -c N -thread $THREAD
+fi
 
 LANGUAGE=`cat ${MODEL}/language.txt`
 echo -ne "Detected Language: $LANGUAGE\033[0K\n"
 
 ### END Tokenization ###
 
-echo ${green}===Part-Of-Speech Tagging===${reset}
-
-if [ ! $LANGUAGE == "JA" ] && [ ! $LANGUAGE == "CN" ]  && [ ! $LANGUAGE == "OTHER" ]  && [ $ENABLE_POS_TAGGING -eq 1 ]; then
-	RAW=tmp/raw_tokenized_text_to_seg.txt # TOKENIZED_TEXT_TO_SEG is the suffix name after "raw_"
-	export THREAD LANGUAGE RAW
-	bash ./tools/treetagger/pos_tag.sh
-	mv tmp/pos_tags.txt tmp/pos_tags_tokenized_text_to_seg.txt
+if [ ! $LANGUAGE == "JA" ] && [ ! $LANGUAGE == "CN" ]  && [ ! $LANGUAGE == "OTHER" ]; then
+    if [ $POS_TAGGING_MODE -eq 1 ]; then
+        echo ${green}===Part-Of-Speech Tagging===${reset}
+        RAW=tmp/raw_tokenized_text_to_seg.txt
+        export THREAD LANGUAGE RAW
+        bash ./tools/treetagger/pos_tag.sh
+        mv tmp/pos_tags.txt tmp/pos_tags_tokenized_text_to_seg.txt
+    elif [ $POS_TAGGING_MODE -eq 2 ]; then
+        echo ${green}===Loading Part-Of-Speech Tagged file===${reset}
+        cp $DATA_DIR/$LANGUAGE/pos_tags.txt tmp/pos_tags_tokenized_text_to_seg.txt
+    fi
 fi
 
 POS_TAGS=tmp/pos_tags_tokenized_text_to_seg.txt
@@ -67,7 +75,7 @@ POS_TAGS=tmp/pos_tags_tokenized_text_to_seg.txt
 
 echo ${green}===Phrasal Segmentation===${reset}
 
-if [ $ENABLE_POS_TAGGING -eq 1 ]; then
+if [[ $POS_TAGGING_MODE -eq 1 || $POS_TAGGING_MODE -eq 2 ]]; then
 	time ./bin/segphrase_segment \
         --pos_tag \
         --thread $THREAD \
