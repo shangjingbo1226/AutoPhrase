@@ -55,6 +55,8 @@ namespace Documents
     map<string, POS_ID_TYPE> posTag2id;
     vector<string> posTag;
 
+    POS_ID_TYPE BOS_ID, EOS_ID;
+
     set<TOKEN_ID_TYPE> stopwords;
 
     set<string> separatePunc = {",", ".", "\"", ";", "!", ":", "(", ")", "\""};
@@ -159,6 +161,17 @@ namespace Documents
 
         INDEX_TYPE docs = 0;
         TOTAL_TOKENS_TYPE ptr = 0;
+
+        if(ENABLE_BOUNDARIES_COST) {
+            for(auto extraPOS : {"#BOS", "#EOS"}) {
+                POS_ID_TYPE posTagId = posTag2id.size();
+                posTag.push_back(extraPOS);
+                posTag2id[extraPOS] = posTagId;
+            }
+            BOS_ID = posTag2id["#BOS"];
+            EOS_ID = posTag2id["#EOS"];
+        }
+
         while (getLine(in)) {
             ++ docs;
             TOTAL_TOKENS_TYPE docStart = ptr;

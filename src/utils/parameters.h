@@ -42,6 +42,7 @@ int NEGATIVE_RATIO = 2;
 int NTHREADS = 4;
 bool ENABLE_POS_TAGGING = false;
 bool ENABLE_POS_PRUNE = false;
+bool ENABLE_BOUNDARIES_COST = true;
 string NO_EXPANSION_POS_FILENAME = "";
 double DISCARD = 0.05;
 string LABEL_FILE = "";

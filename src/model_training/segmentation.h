@@ -100,6 +100,8 @@ public:
         for (TOTAL_TOKENS_TYPE i = 1; i < Documents::totalWordTokens; ++ i) {
             if (!Documents::isEndOfSentence(i - 1)) {
                 ++ total[Documents::posTags[i - 1]][Documents::posTags[i]];
+            }else if(ENABLE_BOUNDARIES_COST) {
+                ++ total[Documents::posTags[i - 1]][Documents::EOS_ID];
             }
         }
     }
@@ -296,7 +298,7 @@ public:
                 continue;
             }
             Pattern pattern;
-            double cost = 0;
+            double cost = get_initial_cost(tags, i);
             bool impossible = true;
             for (size_t j = i, u = 0; j < tokens.size(); ++ j) {
                 if (!trie[u].children.count(tokens[j])) {
@@ -307,7 +309,7 @@ public:
                     impossible = false;
                     PATTERN_ID_TYPE id = trie[u].id;
                     double p = cost + prob[id];
-                    double tagCost = (j + 1 < tokens.size() && tags[j] >= 0 && tags[j + 1] >= 0) ? disconnect[tags[j]][tags[j + 1]] : 0;
+                    double tagCost = get_ending_cost(tags, j);
                     if (f[i] + p + tagCost > f[j + 1]) {
                         f[j + 1] = f[i] + p + tagCost;
                         pre[j + 1] = i;
@@ -318,7 +320,7 @@ public:
                 }
             }
             if (impossible) {
-                double tagCost = (i + 1 < tokens.size() && tags[i] >= 0 && tags[i + 1] >= 0) ? disconnect[tags[i]][tags[i + 1]] : 0;
+                double tagCost = get_ending_cost(tags, i);
                 if (f[i] + tagCost > f[i + 1]) {
                     f[i + 1] = f[i] + tagCost;
                     pre[i + 1] = i;
@@ -550,6 +552,31 @@ public:
                     patterns[id].size() == 1 && patterns[id].quality >= uni_thres);
     }
 
+    inline double get_initial_cost(const vector<POS_ID_TYPE> &tags, int i) {
+        if(ENABLE_BOUNDARIES_COST) {
+            if(tags[i] >= 0) {
+                if(i == 0){
+                    return disconnect[tags[Documents::BOS_ID]][tags[i]];
+                }else if(tags[i - 1] >= 0) {
+                    return disconnect[tags[i - 1]][tags[i]];
+                }
+            }
+        }
+        return 0;
+    }
+
+    inline double get_ending_cost(const vector<POS_ID_TYPE> &tags, int j) {
+        if(tags[j] >= 0) {
+            if(j + 1 == tags.size()) {
+                if(ENABLE_BOUNDARIES_COST) return disconnect[tags[j]][tags[Documents::EOS_ID]];
+                else return 0;
+            }else if(tags[j + 1] >= 0) {
+                return disconnect[tags[j]][tags[j + 1]];
+            }
+        }
+        return 0;
+    }
+
     inline double viterbi_for_testing(const vector<TOKEN_ID_TYPE> &tokens, const vector<POS_ID_TYPE> &tags, vector<double> &f, vector<int> &pre, double multi_thres, double uni_thres) {
         f.clear();
         f.resize(tokens.size() + 1, -INF);
@@ -562,7 +589,7 @@ public:
                 continue;
             }
             Pattern pattern;
-            double cost = 0;
+            double cost = get_initial_cost(tags, i);
             bool impossible = true;
             for (size_t j = i, u = 0; j < tokens.size(); ++ j) {
                 if (!trie[u].children.count(tokens[j])) {
@@ -574,7 +601,7 @@ public:
                         impossible = false;
                         PATTERN_ID_TYPE id = trie[u].id;
                         double p = cost + prob[id];
-                        double tagCost = (j + 1 < tokens.size() && tags[j] >= 0 && tags[j + 1] >= 0) ? disconnect[tags[j]][tags[j + 1]] : 0;
+                        double tagCost = get_ending_cost(tags, j);
                         if (f[i] + p + tagCost > f[j + 1]) {
                             f[j + 1] = f[i] + p + tagCost;
                             pre[j + 1] = i;
@@ -586,7 +613,7 @@ public:
                 }
             }
             if (impossible) {
-                double tagCost = (i + 1 < tokens.size() && tags[i] >= 0 && tags[i + 1] >= 0) ? disconnect[tags[i]][tags[i + 1]] : 0;
+                double tagCost = get_ending_cost(tags, i);
                 if (f[i] + tagCost > f[i + 1]) {
                     f[i + 1] = f[i] + tagCost;
                     pre[i + 1] = i;
