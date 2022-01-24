@@ -178,9 +178,17 @@ Because the original data directory will have been been renamed, it's perfectly 
 cases, there's no need for a user to change the supplied files stored in the default data directory. If such a change is necessary, though, the environment variable that specifies the
 directory in question is "DATA_DIR".
 
+### Docker Image on Docker-hub.
+
+Docker Image is available on Docker hub.
+```
+https://hub.docker.com/repository/docker/shahrukh1unbxd/autophrase
+```
+
 ### In Windows
 
 The ```sudo``` command won't work in a Windows bash shell, and in any case isn't needed in an elevated window--replace it with ```winpty```.
 
 In addition, the ```PWD``` variable works a little oddly in MinGW (the Git bash shell), appending ";C" to the end of the path. To prevent this, replace ```$PWD/models:/autophrase/models``` with ```"/${PWD}/models":/autophrase/models```, and ```$PWD/data/autophrase/data``` with ```"/${PWD}/data:/autophrase/data```.
+
 
