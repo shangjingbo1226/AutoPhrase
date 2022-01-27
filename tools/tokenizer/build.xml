@@ -5,6 +5,7 @@
     <property name="resources.dir"     value="resources"/>
     <path id="classpath">
         <fileset dir="${lib.dir}" includes="**/*.jar"/>
+        <fileset dir="${lib.dir}" includes="**/*.properties"/>
     </path>
 
     <property name="build.dir"   value="build"/>
